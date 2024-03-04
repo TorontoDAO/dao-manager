@@ -234,7 +234,6 @@ export const Profile = () => {
           </CardHeader>
           <CardContent>
             <div>
-              {console.log(profilePic)}
               <img
                 src={profilePic}
                 alt="profile"
