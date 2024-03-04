@@ -121,7 +121,19 @@ export const useAuth = (appHookProps: hookProps) => {
     }
   }, [appId, searchParams])
 
-  return { loading, user, supabaseUser, getUser }
+  const fetchUser= async()=>{
+    const {
+      data: { data: dbData },
+    } = await axios.post("/api/supabase/select", {
+      table: "users",
+      match: {
+        email: localStorage.getItem("email") ?? user?.email,
+      },
+    })
+    setSupabaseUser(dbData?.[0])
+  }
+
+  return { loading, user, supabaseUser, getUser,fetchUser }
 }
 
 export default useAuth

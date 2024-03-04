@@ -41,14 +41,13 @@ export default function IndexPage() {
         <section className="container grid items-center gap-6 pb-8 pt-6 md:py-10">
           <div className="mx-auto flex max-w-[980px] flex-col items-center gap-2 text-center">
             <h1 className="text-3xl font-extrabold leading-tight tracking-tighter md:text-4xl">
-              Cubid Passport - Your New Identity to web3
+              Toronto DAO
             </h1>
             <p className="max-w-[700px] text-lg text-muted-foreground">
-              Add Stamps , verify yourself and step into a secure world of web3
-              where every app is protected with a proof of personhood
+              Welcome to the DAO
             </p>
             <div className="flex gap-4">
-              <Link href={"/login"} className={buttonVariants()}>
+              <Link href={"/login"} className={`${buttonVariants()} w-[110px] font-semibold`}>
                 Login
               </Link>
               {/* <Link href={"/register"} className={buttonVariants()}>

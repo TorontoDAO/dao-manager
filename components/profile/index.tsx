@@ -4,6 +4,7 @@ import axios from "axios"
 import { useDispatch, useSelector } from "react-redux"
 import { toast } from "react-toastify"
 
+import { supabase } from "@/lib/supabase"
 import useAuth from "@/hooks/useAuth"
 import { Button, buttonVariants } from "@/components/ui/button"
 import {
@@ -36,6 +37,7 @@ export const Profile = () => {
   const [userState, setUserState] = useState<any>({})
   const [walletState, setWalletState] = useState<any>({})
   const [exportPrivateKey, setExportPrivateKey] = useState(undefined)
+  const [profilePic, setProfilePic] = useState("")
 
   const fetchStamps = useCallback(async () => {
     if (email) {
@@ -77,6 +79,15 @@ export const Profile = () => {
   const [allEvmData, setAllEvmData] = useState([])
   const { supabaseUser } = useAuth({})
 
+  useEffect(() => {
+    if (supabaseUser?.dao_info?.profile_pic) {
+      const { data } = supabase.storage
+        .from("supabase-pfp")
+        .getPublicUrl(supabaseUser?.dao_info?.profile_pic)
+      setProfilePic(data?.publicUrl)
+    }
+  }, [supabaseUser])
+
   const fetchWallets = useCallback(async () => {
     if (supabaseUser?.id) {
       const {
@@ -105,7 +116,6 @@ export const Profile = () => {
   }, [supabaseUser])
 
   const fetchPrivateKeyWithAddress = (nearKey: any) => {
-    console.log(nearKey, allNearData)
     const stampData = (
       allNearData.find((item: any) => item.uniquevalue === nearKey) as any
     )?.stamp_json?.transaction?.signature
@@ -215,6 +225,29 @@ export const Profile = () => {
                 />
                 <p>Enabled Login</p>
               </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>User Profile</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div>
+              {console.log(profilePic)}
+              <img
+                src={profilePic}
+                alt="profile"
+                className="size-6 rounded-full"
+              />
+              <p>Username : {supabaseUser?.dao_info?.username} </p>
+              <p>
+                Location :{" "}
+                {JSON.stringify(supabaseUser?.dao_info?.location)?.replaceAll(
+                  `"`,
+                  ""
+                )}
+              </p>
             </div>
           </CardContent>
         </Card>

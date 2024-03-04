@@ -60,15 +60,7 @@ export default function AuthenticationPage() {
             >
               <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
             </svg>
-            Cubid Passport Inc
-          </div>
-          <div className="relative z-20 mt-auto">
-            <blockquote className="space-y-2">
-              <p className="text-lg">
-                {`"Welcome to the cubid passort, proof of humanity on web3 and the new internet"`}
-              </p>
-              <footer className="text-sm">Noak</footer>
-            </blockquote>
+            Toronto DAO
           </div>
         </div>
         <div className="lg:p-8">
