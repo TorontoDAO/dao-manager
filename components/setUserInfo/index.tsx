@@ -10,20 +10,22 @@ import {
 import { UserProfileForm } from "./userForm"
 
 export const SetUserInfo = ({ open, onClose, fetchUser }: any) => {
-  useEffect(() => {
-    setTimeout(() => {
-      // Select the SVG element using a query that matches its attributes
-      // This is a basic example; you might need a more specific selector
-      const svgCross: any = document.querySelector(
-        'svg[fill="none"][stroke="currentColor"]'
-      )
+  // useEffect(() => {
+  //   if (open) {
+  //     setTimeout(() => {
+  //       // Select the SVG element using a query that matches its attributes
+  //       // This is a basic example; you might need a more specific selector
+  //       const svgCross: any = document.querySelector(
+  //         'svg[fill="none"][stroke="currentColor"]'
+  //       )
 
-      if (svgCross) {
-        // Remove the SVG element from its parent
-        svgCross.parentNode.removeChild(svgCross)
-      }
-    }, 1000)
-  }, [])
+  //       if (svgCross) {
+  //         // Remove the SVG element from its parent
+  //         svgCross.parentNode.removeChild(svgCross)
+  //       }
+  //     }, 3000)
+  //   }
+  // }, [open])
   return (
     <Sheet
       open={open}

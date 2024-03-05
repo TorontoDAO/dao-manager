@@ -99,6 +99,8 @@ export default function AuthenticationPage() {
               onChange={(e) => {
                 setEmailVal(e.target.value)
               }}
+              autoComplete
+              id="email"
               ref={emailField}
               placeholder="Email"
             />

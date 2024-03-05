@@ -36,23 +36,21 @@ export function UserProfileForm({ fetchUser }: any) {
   const { supabaseUser } = useAuth({})
 
   const onSubmit = async (data: any) => {
-    if (isUsernameAvailable) {
-      await axios.post("/api/supabase/update", {
-        table: "users",
-        body: {
-          dao_info: {
-            profile_pic: profilePic,
-            username: data?.username,
-            location: data?.location,
-          },
+    await axios.post("/api/supabase/update", {
+      table: "users",
+      body: {
+        dao_info: {
+          profile_pic: profilePic,
           username: data?.username,
+          location: data?.location,
         },
-        match: {
-          id: supabaseUser?.id,
-        },
-      })
-      fetchUser()
-    }
+        username: data?.username,
+      },
+      match: {
+        id: supabaseUser?.id,
+      },
+    })
+    fetchUser()
   }
 
   const getLocation = () => {
@@ -259,7 +257,8 @@ export function UserProfileForm({ fetchUser }: any) {
 
       <button
         type="submit"
-        className="w-full rounded-md bg-blue-500 px-4 py-2 text-white"
+        disabled={!isUsernameAvailable}
+        className={`w-full rounded-md bg-blue-500 px-4 py-2 text-white ${isUsernameAvailable===true?`opacity-1`:`opacity-70`}`}
       >
         Submit
       </button>
