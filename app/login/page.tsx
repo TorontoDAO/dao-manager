@@ -50,7 +50,7 @@ export default function AuthenticationPage() {
       // axios.post('/api/login-create-user',{
       //   email
       // })
-      toast.success("Successfully logged into cubid")
+      toast.success("Successfully logged into Toronto DAO")
     } catch (err) {
       console.error(err)
       toast.error("An error while authenticating user")

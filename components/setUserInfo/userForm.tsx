@@ -8,7 +8,18 @@ import useAuth from "@/hooks/useAuth"
 
 import { supabase } from "../../lib/supabase"
 
-export function UserProfileForm({fetchUser}:any) {
+function extractLatLong({ latitude, longitude }) {
+  function roundToOneDecimal(floatNumber) {
+    return Math.round(floatNumber * 10) / 10
+  }
+
+  return {
+    latitude: roundToOneDecimal(latitude),
+    longitude: roundToOneDecimal(longitude),
+  }
+}
+
+export function UserProfileForm({ fetchUser }: any) {
   const {
     register,
     handleSubmit,
@@ -17,6 +28,7 @@ export function UserProfileForm({fetchUser}:any) {
     formState: { errors },
   } = useForm()
   const location = watch("location")
+  const formValues = watch()
   const [locationError, setLocationError] = useState("")
   const [userNameLoading, setUserNameLoading] = useState(false)
   const [isUsernameAvailable, setIsUsernameAvailable] = useState<any>(null)
@@ -38,7 +50,7 @@ export function UserProfileForm({fetchUser}:any) {
         match: {
           id: supabaseUser?.id,
         },
-      });
+      })
       fetchUser()
     }
   }
@@ -52,7 +64,7 @@ export function UserProfileForm({fetchUser}:any) {
     function success(position: any) {
       const latitude = position.coords.latitude
       const longitude = position.coords.longitude
-      setValue("location", `Latitude: ${latitude}, Longitude: ${longitude}`)
+      setValue("location", { latitude, longitude })
     }
 
     function error() {
@@ -85,7 +97,7 @@ export function UserProfileForm({fetchUser}:any) {
       <div>
         <label
           htmlFor="username"
-          className="text-md block font-medium text-gray-100"
+          className="text-md block font-medium dark:text-gray-100"
         >
           Username
         </label>
@@ -105,7 +117,7 @@ export function UserProfileForm({fetchUser}:any) {
                 setValue("username", e.target.value)
               }
             }}
-            className="mt-1 block w-full rounded-md border border-gray-600 bg-black px-3 py-2 text-white shadow-sm sm:text-sm"
+            className="mt-1 block w-full rounded-md border border-gray-600 px-3 py-2 shadow-sm dark:bg-black dark:text-white sm:text-sm"
           />
           {isUsernameAvailable && (
             <svg
@@ -163,15 +175,21 @@ export function UserProfileForm({fetchUser}:any) {
             </>
           )}
         </div>
-        {errors.username && (
+        {!formValues.username && errors.username && (
           <p className="mt-2 text-sm text-red-600">Username is required</p>
+        )}
+        {isUsernameAvailable === false && (
+          <p className="mt-2 text-sm text-red-600">Username unavailable</p>
+        )}
+        {isUsernameAvailable && (
+          <p className="mt-2 text-sm text-green-500">Username available</p>
         )}
       </div>
 
       <div>
         <label
           htmlFor="profilePhoto"
-          className="text-md block font-medium text-gray-100"
+          className="text-md block font-medium dark:text-gray-100"
         >
           Profile Photo
         </label>
@@ -199,9 +217,9 @@ export function UserProfileForm({fetchUser}:any) {
               },
             })
           }}
-          className="mt-1 block w-full rounded-md border border-gray-600 bg-black px-3 py-2 text-white shadow-sm sm:text-sm"
+          className="mt-1 block w-full rounded-md border border-gray-600 px-3 py-2 dark:text-white shadow-sm dark:bg-black sm:text-sm"
         />
-        {errors.profilePhoto && (
+        {!Boolean(profilePic) && errors.profilePhoto && (
           <p className="mt-2 text-sm text-red-600">Profile photo is required</p>
         )}
       </div>
@@ -209,9 +227,9 @@ export function UserProfileForm({fetchUser}:any) {
       <div>
         <label
           htmlFor="location"
-          className="text-md block font-medium text-gray-100"
+          className="text-md block font-medium dark:text-gray-100"
         >
-          Location
+          Approx. location is required
         </label>
         <button
           type="button"
@@ -219,7 +237,9 @@ export function UserProfileForm({fetchUser}:any) {
           className="mt-1 w-full rounded-md bg-blue-500 px-3 py-2 text-xs text-white"
         >
           {location
-            ? JSON.stringify(location).replaceAll(`"`, "")
+            ? `Latitude : ${extractLatLong(location)?.latitude} , Longitude : ${
+                extractLatLong(location)?.longitude
+              }`
             : "Use current location"}
         </button>
         <input
@@ -232,7 +252,7 @@ export function UserProfileForm({fetchUser}:any) {
         {locationError && (
           <p className="mt-2 text-sm text-red-600">{locationError}</p>
         )}
-        {errors.location && (
+        {!formValues.location && errors.location && (
           <p className="mt-2 text-sm text-red-600">Location is required</p>
         )}
       </div>

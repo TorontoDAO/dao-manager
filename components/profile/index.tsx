@@ -126,6 +126,10 @@ export const Profile = () => {
     fetchWallets()
   }, [fetchWallets])
 
+  function roundToOneDecimal(floatNumber: any) {
+    return Math.round(floatNumber * 10) / 10
+  }
+
   return (
     <div className="p-3">
       <h1 className="mb-2 text-3xl font-semibold">Profile</h1>
@@ -241,11 +245,10 @@ export const Profile = () => {
               />
               <p>Username : {supabaseUser?.dao_info?.username} </p>
               <p>
-                Location :{" "}
-                {JSON.stringify(supabaseUser?.dao_info?.location)?.replaceAll(
-                  `"`,
-                  ""
-                )}
+                Location : Latitude :{" "}
+                {roundToOneDecimal(supabaseUser?.dao_info?.location.latitude)}
+                Longitude :{" "}
+                {roundToOneDecimal(supabaseUser?.dao_info?.location.longitude)}
               </p>
             </div>
           </CardContent>
