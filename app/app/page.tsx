@@ -30,7 +30,7 @@ export default function IndexPage() {
       },
     })
   )
-  const {supabaseUser,fetchUser} = useAuth({})
+  const {supabaseUser,fetchUser,loading:userLoading} = useAuth({})
   useEffect(() => {
     // 1. Get projectId
     const projectId = "046f59ead3e8ec7acd1db6ba73cd23b7"
@@ -56,7 +56,7 @@ export default function IndexPage() {
     return <></>
   }
 
-  if(!supabaseUser?.dao_info)
+  if(!supabaseUser?.dao_info && !userLoading)
   return <SetUserInfo open={true} fetchUser={fetchUser} />
 
   return (

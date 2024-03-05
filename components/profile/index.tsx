@@ -133,7 +133,28 @@ export const Profile = () => {
   return (
     <div className="p-3">
       <h1 className="mb-2 text-3xl font-semibold">Profile</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <Card>
+          <CardHeader>
+            <CardTitle>User Profile</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div>
+              <img
+                src={profilePic}
+                alt="profile"
+                className="mb-2 size-14 border border-gray-600 rounded-full"
+              />
+              <p>Username : {supabaseUser?.dao_info?.username} </p>
+              <p>
+                Location : Latitude :{" "}
+                {roundToOneDecimal(supabaseUser?.dao_info?.location.latitude)}
+                Longitude :{" "}
+                {roundToOneDecimal(supabaseUser?.dao_info?.location.longitude)}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
         <Card style={{ height: "auto" }}>
           <CardHeader>
             <CardTitle>My Trust Score</CardTitle>
@@ -170,7 +191,7 @@ export const Profile = () => {
                 </Button>
               ))}
               {nearAcc.map((item) => (
-                <div className="flex justify-between items-center">
+                <div className="flex items-center justify-between">
                   <Button className="block" key={item} variant="outline">
                     {item}
                   </Button>
@@ -185,7 +206,7 @@ export const Profile = () => {
                       onClick={() => {
                         fetchPrivateKeyWithAddress(item)
                       }}
-                      className="text-white rounded-md bg-blue-600 text-xs p-2 py-1"
+                      className="rounded-md bg-blue-600 p-2 py-1 text-xs text-white"
                     >
                       Export Private Key
                     </button>
@@ -224,7 +245,7 @@ export const Profile = () => {
               <div className="mt-2 flex items-center gap-2">
                 <img
                   alt="image"
-                  className="h-20 w-20 rounded"
+                  className="size-20 rounded"
                   src="https://media.licdn.com/dms/image/C4D0BAQF0BbRWBLibVQ/company-logo_200_200/0/1622628086077?e=2147483647&v=beta&t=z_LYy9iZWArzniYy0I2aWqRgyK6kMTLcRsSuW7dZfq0"
                 />
                 <p>Enabled Login</p>
@@ -232,27 +253,7 @@ export const Profile = () => {
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>User Profile</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div>
-              <img
-                src={profilePic}
-                alt="profile"
-                className="size-6 rounded-full"
-              />
-              <p>Username : {supabaseUser?.dao_info?.username} </p>
-              <p>
-                Location : Latitude :{" "}
-                {roundToOneDecimal(supabaseUser?.dao_info?.location.latitude)}
-                Longitude :{" "}
-                {roundToOneDecimal(supabaseUser?.dao_info?.location.longitude)}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+       
         <Card style={{ height: "fit-content", paddingTop: "15px" }}>
           <CardContent>
             <Button
