@@ -8,6 +8,7 @@ import { ToastContainer } from "react-toastify"
 
 import "react-phone-input-2/lib/style.css"
 import "react-toastify/dist/ReactToastify.css"
+import 'leaflet/dist/leaflet.css';
 import { usePathname } from "next/navigation"
 import { getAuth, getIdToken, signInWithCustomToken } from "firebase/auth"
 import { SessionProvider } from "next-auth/react"

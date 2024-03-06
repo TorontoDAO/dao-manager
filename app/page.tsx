@@ -43,7 +43,7 @@ export default function IndexPage() {
             <h1 className="text-3xl font-extrabold leading-tight tracking-tighter md:text-4xl">
               Toronto DAO
             </h1>
-            <p className="max-w-[700px] text-lg text-muted-foreground">
+            <p className="mb-2 max-w-[700px] text-lg text-muted-foreground">
               Welcome to the DAO
             </p>
             <div className="flex gap-4">

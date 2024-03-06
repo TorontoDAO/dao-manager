@@ -7,7 +7,6 @@ import { useForm } from "react-hook-form"
 import useAuth from "@/hooks/useAuth"
 
 import { supabase } from "../../lib/supabase"
-import { SetLocation } from "./setLocation"
 
 function extractLatLong({ latitude, longitude }) {
   function roundToOneDecimal(floatNumber) {
@@ -27,7 +26,9 @@ export function UserProfileForm({ fetchUser }: any) {
     setValue,
     watch,
     formState: { errors },
-  } = useForm()
+  } = useForm({
+    defaultValues: {},
+  })
   const location = watch("location")
   const formValues = watch()
   const [locationError, setLocationError] = useState("")
@@ -206,6 +207,15 @@ export function UserProfileForm({ fetchUser }: any) {
                 upsert: true,
               })
             setProfilePic(data?.path ?? "")
+            await axios.post("/api/supabase/insert", {
+              table: "users",
+              body: {
+                profile_pic: data?.path,
+              },
+              match: {
+                id: supabaseUser?.id,
+              },
+            })
           }}
           className="mt-1 block w-full rounded-md border border-gray-600 px-3 py-2 dark:text-white shadow-sm dark:bg-black sm:text-sm"
         />
