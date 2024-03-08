@@ -62,6 +62,7 @@ export function UserProfileForm({ fetchUser }: any) {
 
   const getLocation = () => {
     if (!navigator.geolocation) {
+      setShowLocationSearch(true)
       setLocationError("Geolocation is not supported by your browser")
       return
     }
@@ -76,6 +77,7 @@ export function UserProfileForm({ fetchUser }: any) {
     }
 
     function error() {
+      setShowLocationSearch(true)
       setLocationError("Unable to retrieve your location")
     }
     if (!navigator?.geolocation?.getCurrentPosition) {
@@ -172,11 +174,11 @@ export function UserProfileForm({ fetchUser }: any) {
               setIsUsernameAvailable(null)
               if (e.target.value.length > 2) {
                 setUserNameLoading(true)
-                setValue("username", e.target.value)
-                searchUserName(e.target.value)
+                setValue("username", e.target.value.toLowerCase())
+                searchUserName(e.target.value.toLowerCase())
               } else {
                 setUserNameLoading(false)
-                setValue("username", e.target.value)
+                setValue("username", e.target.value.toLowerCase())
               }
             }}
             className="mt-1 block w-full rounded-md border border-gray-600 px-3 py-2 shadow-sm dark:bg-black dark:text-white sm:text-sm"
