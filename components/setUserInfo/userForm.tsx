@@ -1,3 +1,4 @@
+/* eslint-disable tailwindcss/migration-from-tailwind-2 */
 // @ts-nocheck
 import React, { useCallback, useState } from "react"
 import axios from "axios"
@@ -34,7 +35,9 @@ export function UserProfileForm({ fetchUser }: any) {
   const [userNameLoading, setUserNameLoading] = useState(false)
   const [isUsernameAvailable, setIsUsernameAvailable] = useState<any>(null)
   const [profilePic, setProfilePic] = useState("")
+  const [showLocationSearch, setShowLocationSearch] = useState(false)
   const { supabaseUser } = useAuth({})
+  const [showWelcomeMessage, setShowWelcomeMessage] = useState(false)
 
   const onSubmit = async (data: any) => {
     await axios.post("/api/supabase/update", {
@@ -51,7 +54,10 @@ export function UserProfileForm({ fetchUser }: any) {
         id: supabaseUser?.id,
       },
     })
-    fetchUser()
+    setShowWelcomeMessage(true)
+    setTimeout(() => {
+      fetchUser()
+    }, 10000)
   }
 
   const getLocation = () => {
@@ -63,13 +69,18 @@ export function UserProfileForm({ fetchUser }: any) {
     function success(position: any) {
       const latitude = position.coords.latitude
       const longitude = position.coords.longitude
+      if (!Boolean(latitude)) {
+        setShowLocationSearch(true)
+      }
       setValue("location", { latitude, longitude })
     }
 
     function error() {
       setLocationError("Unable to retrieve your location")
     }
-
+    if (!navigator?.geolocation?.getCurrentPosition) {
+      setShowLocationSearch(true)
+    }
     navigator.geolocation.getCurrentPosition(success, error)
   }
 
@@ -90,6 +101,58 @@ export function UserProfileForm({ fetchUser }: any) {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const searchUserName = useCallback(_.debounce(search, 500), [])
+
+  const [searchLocation, setSearchLocation] = useState("")
+  const [results, setResults] = useState([])
+  const [locationSelected, setLocation] = useState(null)
+
+  const fetchPlaces = async (searchQuery: string) => {
+    if (!searchQuery) {
+      setResults([])
+      return
+    }
+
+    try {
+      const response = await axios.post(`/api/location-search`, {
+        searchQuery,
+      })
+      console.log(response.data.data.results)
+      if (response.data.data && response.data.data.results) {
+        setResults(response.data.data.results)
+      }
+    } catch (error) {
+      console.error("Error fetching data: ", error)
+      setResults([])
+    }
+  }
+
+  // Debounce the fetchPlaces function
+  const debouncedFetchPlaces = useCallback(_.debounce(fetchPlaces, 300), [])
+
+  const handleSearch = (text: string) => {
+    setSearchLocation(text)
+    setLocation(null)
+    debouncedFetchPlaces(text)
+  }
+
+  if (showWelcomeMessage) {
+    return (
+      <div className="mt-2">
+        <hr className="my-1"/>
+        <p className="font-bold my-2">
+          On the next page you can opt in to provide more information about
+          yourself in the form of “stamps” which will increase your score. This
+          information will not be shown to anyone else (unless you explicitly
+          allow it later.) The primary purpose of the stamps is to provide
+          calculate an experimental “humanity score.” This score is the only
+          thing other members will see
+        </p>
+        <p className="text-xs animate-pulse">
+          Redirecting you to the dashboard in 10 seconds
+        </p>
+      </div>
+    )
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -207,7 +270,7 @@ export function UserProfileForm({ fetchUser }: any) {
               })
             setProfilePic(data?.path ?? "")
           }}
-          className="mt-1 block w-full rounded-md border border-gray-600 px-3 py-2 dark:text-white shadow-sm dark:bg-black sm:text-sm"
+          className="mt-1 block w-full rounded-md border border-gray-600 px-3 py-2 shadow-sm dark:bg-black dark:text-white sm:text-sm"
         />
         {!Boolean(profilePic) && errors.profilePhoto && (
           <p className="mt-2 text-sm text-red-600">Profile photo is required</p>
@@ -215,23 +278,79 @@ export function UserProfileForm({ fetchUser }: any) {
       </div>
 
       <div>
-        <label
-          htmlFor="location"
-          className="text-md block font-medium dark:text-gray-100"
-        >
-          Approx. location is required
-        </label>
-        <button
-          type="button"
-          onClick={getLocation}
-          className="mt-1 w-full rounded-md bg-blue-500 px-3 py-2 text-xs text-white"
-        >
-          {location
-            ? `Latitude : ${extractLatLong(location)?.latitude} , Longitude : ${
-                extractLatLong(location)?.longitude
-              }`
-            : "Use current location"}
-        </button>
+        {!showLocationSearch && (
+          <>
+            <label
+              htmlFor="location"
+              className="text-md block font-medium dark:text-gray-100"
+            >
+              Approx. location is required
+            </label>
+            <button
+              type="button"
+              onClick={getLocation}
+              className="mt-1 w-full rounded-md bg-blue-500 px-3 py-2 text-xs text-white"
+            >
+              {location
+                ? `Latitude : ${
+                    extractLatLong(location)?.latitude
+                  } , Longitude : ${extractLatLong(location)?.longitude}`
+                : "Use current location"}
+            </button>
+          </>
+        )}
+        {showLocationSearch && (
+          <>
+            <label
+              htmlFor="location"
+              className="text-md block font-medium dark:text-gray-100"
+            >
+              Search Location
+            </label>
+            <input
+              id="location"
+              type="text"
+              value={searchLocation}
+              onChange={(e) => {
+                handleSearch(e.target.value)
+              }}
+              className="mt-1 block w-full rounded-md border border-gray-600 px-3 py-2 shadow-sm dark:bg-black dark:text-white sm:text-sm"
+            />
+            <div className="mt-3 space-y-1">
+              {results.map((item: any) => (
+                <div
+                  onClick={() => {
+                    console.log(item)
+                    setLocation(item)
+                    setValue(
+                      "location",
+                      extractLatLong({
+                        latitude: item.geometry.lat,
+                        lng: item.geometry.lng,
+                      })
+                    )
+                  }}
+                  className={`w-full p-2 text-xs ${
+                    item.place_id === locationSelected?.place_id
+                      ? ""
+                      : "bg-opacity-90"
+                  } rounded-md border-2`}
+                  key={item.place_id}
+                >
+                  <p
+                    className={` ${
+                      item.place_id === locationSelected?.place_id
+                        ? "font-bold"
+                        : "font-light"
+                    }`}
+                  >
+                    {item.formatted_address}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
         <input
           id="location"
           type="text"

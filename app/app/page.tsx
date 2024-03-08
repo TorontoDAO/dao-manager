@@ -15,8 +15,8 @@ import { arbitrum, mainnet } from "wagmi/chains"
 import useAuth from "@/hooks/useAuth"
 import { buttonVariants } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { SetUserInfo } from "@/components/setUserInfo"
 import { Members } from "@/components/member"
+import { SetUserInfo } from "@/components/setUserInfo"
 
 export default function IndexPage() {
   const [wagmiConfig, setWagmiConfig] = useState(
@@ -57,7 +57,7 @@ export default function IndexPage() {
     return <></>
   }
 
-  if (!supabaseUser?.dao_info && !userLoading)
+  if (!supabaseUser?.dao_info && supabaseUser?.email && userLoading === false)
     return <SetUserInfo open={true} fetchUser={fetchUser} />
 
   return (

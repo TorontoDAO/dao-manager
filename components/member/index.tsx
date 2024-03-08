@@ -1,9 +1,11 @@
+/* eslint-disable @next/next/no-img-element */
 import React, { useEffect, useState } from "react"
 import axios from "axios"
+import dayjs from "dayjs"
 
 import { supabase } from "@/lib/supabase"
 
-const DaoCard = ({item}: any) => {
+const DaoCard = ({ item }: any) => {
   const [profilepic, setProfilePic] = useState("")
   useEffect(() => {
     if (item?.dao_info?.profile_pic) {
@@ -16,20 +18,16 @@ const DaoCard = ({item}: any) => {
   function roundToOneDecimal(floatNumber: any) {
     return Math.round(floatNumber * 10) / 10
   }
-
   return (
-    <div className="border border-gray-200 p-2 rounded-md dark:border-gray-800">
+    <div className="rounded-lg border border-gray-200 p-4 dark:border-gray-800">
       <img
         src={profilepic}
         alt="profile"
-        className="mb-2 size-14 border border-gray-600 rounded-full"
+        className="mb-2 size-14 rounded-full border border-gray-600 object-cover"
       />
-      <p>Username : {item?.username} </p>
-      <p>
-        Location : Latitude :{" "}
-        {roundToOneDecimal(item?.dao_info?.location.latitude)} Longitude :{" "}
-        {roundToOneDecimal(item?.dao_info?.location.longitude)}
-      </p>
+      <p className="font-bold">{item?.username} </p>
+      <p className="text-xs">Score : 87%</p>
+      <p className="text-xs">User since {dayjs(item.created_at).format("DD MMMM YYYY")}</p>
     </div>
   )
 }
@@ -64,7 +62,7 @@ export const Members = () => {
             recognized and rewarded for their generosity.
           </p>
         </div>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
           {accounts.map((item: any) => (
             <DaoCard key={item.id} item={item} />
           ))}

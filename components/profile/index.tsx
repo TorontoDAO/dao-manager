@@ -157,20 +157,28 @@ export const Profile = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <div>
-              <img
-                src={profilePic}
-                alt="profile"
-                className="mb-2 size-14 border border-gray-600 rounded-full"
-              />
-              <p>Username : {supabaseUser?.dao_info?.username} </p>
-              <p>
-                Location : Latitude :{" "}
-                {roundToOneDecimal(supabaseUser?.dao_info?.location.latitude)}{" "}
-                Longitude :{" "}
-                {roundToOneDecimal(supabaseUser?.dao_info?.location.longitude)}
-              </p>
-            </div>
+            {Boolean(supabaseUser?.dao_info?.username) && (
+              <>
+                <div>
+                  <img
+                    src={profilePic}
+                    alt="profile"
+                    className="mb-2 size-14 border border-gray-600 rounded-full"
+                  />
+                  <p>Username : {supabaseUser?.dao_info?.username} </p>
+                  <p>
+                    Location : Latitude :{" "}
+                    {roundToOneDecimal(
+                      supabaseUser?.dao_info?.location.latitude
+                    )}{" "}
+                    Longitude :{" "}
+                    {roundToOneDecimal(
+                      supabaseUser?.dao_info?.location.longitude
+                    )}
+                  </p>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
         <Card style={{ height: "auto" }}>
