@@ -140,7 +140,7 @@ export function UserProfileForm({ fetchUser }: any) {
   if (showWelcomeMessage) {
     return (
       <div className="mt-2">
-        <hr className="my-1" />
+        <hr className="my-1"/>
         <p className="font-bold my-2">
           On the next page you can opt in to provide more information about
           yourself in the form of “stamps” which will increase your score. This
@@ -264,24 +264,14 @@ export function UserProfileForm({ fetchUser }: any) {
           {...register("profilePhoto", { required: true })}
           onChange={async (e: any) => {
             const file = e.target.files[0]
-            const toBase64 = (file) =>
-              new Promise((resolve, reject) => {
-                const reader = new FileReader()
-                reader.readAsDataURL(file)
-                reader.onload = () => resolve(reader.result)
-                reader.onerror = reject
-              })
+            const fileToBlob = async (files) => new Blob([new Uint8Array(await files.arrayBuffer())], {type: files.type });
 
             const { data, error } = await supabase.storage
               .from("supabase-pfp")
-              .upload(
-                `images/${supabaseUser?.email}.png`,
-                await toBase64(file),
-                {
-                  cacheControl: "3600",
-                  upsert: true,
-                }
-              )
+              .upload(`images/${supabaseUser?.email}.png`, await fileToBlob(file), {
+                cacheControl: "3600",
+                upsert: true,
+              })
             setProfilePic(data?.path ?? "")
           }}
           className="mt-1 block w-full rounded-md border border-gray-600 px-3 py-2 shadow-sm dark:bg-black dark:text-white sm:text-sm"
