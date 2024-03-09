@@ -27,25 +27,14 @@ export const SetUserInfo = ({ open, onClose, fetchUser }: any) => {
   //   }
   // }, [open])
   return (
-    <Sheet
-      open={open}
-      onOpenChange={(value) => {
-        if (value === false) {
-          onClose()
-        }
-      }}
-    >
-      <SheetContent>
-        <SheetHeader>
-          <SheetTitle>Welcome to Toronto DAO</SheetTitle>
-          <p>
-            It looks like you are new here. To sign up we ask that you provide a
-            username, a profile picture and an approximate location. This
-            information will be made public to other members
-          </p>
-          <UserProfileForm fetchUser={fetchUser} />
-        </SheetHeader>
-      </SheetContent>
-    </Sheet>
+    <div className="p-3">
+      <p className="text-xl font-bold">Welcome to Toronto DAO</p>
+      <p>
+        It looks like you are new here. To sign up we ask that you provide a
+        username, a profile picture and an approximate location. This
+        information will be made public to other members
+      </p>
+      <UserProfileForm fetchUser={fetchUser} />
+    </div>
   )
 }

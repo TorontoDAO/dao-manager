@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import { logout } from "@/redux/userSlice"
 import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi/react"
 import { About } from "components/about"
@@ -32,6 +33,7 @@ export default function IndexPage() {
     })
   )
   const { supabaseUser, fetchUser, loading: userLoading } = useAuth({})
+  const { push } = useRouter()
   useEffect(() => {
     // 1. Get projectId
     const projectId = "046f59ead3e8ec7acd1db6ba73cd23b7"
@@ -53,12 +55,19 @@ export default function IndexPage() {
   const dispatch = useDispatch()
   const [tab, setTab] = useState("stamps")
 
+  useEffect(() => {
+    if (
+      !supabaseUser?.dao_info &&
+      supabaseUser?.email &&
+      userLoading === false
+    ) {
+      push("/set-user-info")
+    }
+  }, [push, supabaseUser, userLoading])
+
   if (!wagmiConfig) {
     return <></>
   }
-
-  if (!supabaseUser?.dao_info && supabaseUser?.email && userLoading === false)
-    return <SetUserInfo open={true} fetchUser={fetchUser} />
 
   return (
     <WagmiConfig config={wagmiConfig as any}>
