@@ -30,6 +30,9 @@ import {
 } from "@/components/ui/sheet"
 
 import { logout } from "../../redux/userSlice"
+import { EditLocation } from "./editLocation"
+import { EditProfilePicture } from "./editProfilePicture"
+import { EditUsername } from "./editUsername"
 
 export const Profile = () => {
   const { email = "" } = useSelector((state: any) => state?.user) ?? {}
@@ -38,6 +41,10 @@ export const Profile = () => {
   const [walletState, setWalletState] = useState<any>({})
   const [exportPrivateKey, setExportPrivateKey] = useState(undefined)
   const [profilePic, setProfilePic] = useState("")
+
+  const [usernameModalOpen, setUsernameModalOpen] = useState(false)
+  const [profilePictureModalOpen, setProfilePictureModalOpen] = useState(false)
+  const [locationModalOpen, setLocationModalOpen] = useState(false)
 
   const fetchStamps = useCallback(async () => {
     if (email) {
@@ -77,7 +84,7 @@ export const Profile = () => {
   const [nearAcc, setNearAcc] = useState([])
   const [allNearData, setAllNearData] = useState([])
   const [allEvmData, setAllEvmData] = useState([])
-  const { supabaseUser } = useAuth({})
+  const { supabaseUser, fetchUser } = useAuth({})
 
   useEffect(() => {
     if (supabaseUser?.dao_info?.profile_pic) {
@@ -130,6 +137,27 @@ export const Profile = () => {
     return Math.round(floatNumber * 10) / 10
   }
 
+  const editButton = ({ onClick }: any) => {
+    return (
+      <button onClick={onClick} className="dark:text-white text-black">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          className="w-3 h-3"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
+          />
+        </svg>
+      </button>
+    )
+  }
+
   return (
     <div className="p-3">
       <h1 className="mb-2 text-3xl font-semibold">Profile</h1>
@@ -138,44 +166,49 @@ export const Profile = () => {
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>User Profile</CardTitle>
-              {/* <button className="dark:text-white">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  className="w-4 h-4"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
-                  />
-                </svg>
-              </button> */}
             </div>
           </CardHeader>
           <CardContent>
             {Boolean(supabaseUser?.dao_info?.username) && (
               <>
                 <div>
-                  <img
-                    src={profilePic}
-                    alt="profile"
-                    className="mb-2 size-14 border border-gray-600 rounded-full"
-                  />
-                  <p>Username : {supabaseUser?.dao_info?.username} </p>
-                  <p>
-                    Location : Latitude :{" "}
-                    {roundToOneDecimal(
-                      supabaseUser?.dao_info?.location.latitude
-                    )}{" "}
-                    Longitude :{" "}
-                    {roundToOneDecimal(
-                      supabaseUser?.dao_info?.location.longitude
-                    )}
-                  </p>
+                  <div className="flex items-center space-x-2">
+                    <img
+                      src={`${profilePic}?string=${Math.random()}`}
+                      alt="profile"
+                      className="mb-2 size-14 border border-gray-600 rounded-full"
+                    />
+                    {editButton({
+                      onClick: () => {
+                        setProfilePictureModalOpen(true)
+                      },
+                    })}
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <p>Username : {supabaseUser?.dao_info?.username} </p>
+                    {editButton({
+                      onClick: () => {
+                        setUsernameModalOpen(true)
+                      },
+                    })}
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <p>
+                      Location : Latitude :{" "}
+                      {roundToOneDecimal(
+                        supabaseUser?.dao_info?.location.latitude
+                      )}{" "}
+                      Longitude :{" "}
+                      {roundToOneDecimal(
+                        supabaseUser?.dao_info?.location.longitude
+                      )}
+                    </p>
+                    {editButton({
+                      onClick: () => {
+                        setLocationModalOpen(true)
+                      },
+                    })}
+                  </div>
                 </div>
               </>
             )}
@@ -319,6 +352,36 @@ export const Profile = () => {
             </SheetHeader>
           </SheetContent>
         </Sheet>
+        <EditUsername
+          fetchUser={() => {
+            setUsernameModalOpen(false)
+            fetchUser?.()
+          }}
+          open={usernameModalOpen}
+          onClose={() => {
+            setUsernameModalOpen(false)
+          }}
+        />
+        <EditLocation
+          fetchUser={() => {
+            setLocationModalOpen(false)
+            fetchUser?.()
+          }}
+          open={locationModalOpen}
+          onClose={() => {
+            setLocationModalOpen(false)
+          }}
+        />
+        <EditProfilePicture
+          fetchUser={() => {
+            setProfilePictureModalOpen(false)
+            fetchUser?.()
+          }}
+          open={profilePictureModalOpen}
+          onClose={() => {
+            setProfilePictureModalOpen(false)
+          }}
+        />
       </div>
     </div>
   )

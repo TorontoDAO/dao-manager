@@ -21,7 +21,7 @@ const DaoCard = ({ item }: any) => {
   return (
     <div className="rounded-lg border border-gray-200 p-4 dark:border-gray-800">
       <img
-        src={profilepic}
+        src={`${profilepic}?string=${Math.random()}`}
         alt="profile"
         className="mb-2 size-14 rounded-full border border-gray-600 object-cover"
       />
