@@ -4,6 +4,7 @@ import axios from "axios"
 import dayjs from "dayjs"
 
 import { supabase } from "@/lib/supabase"
+import {ShowUserInfo} from './showUserInfo'
 
 const DaoCard = ({ item }: any) => {
   const [profilepic, setProfilePic] = useState("")
@@ -20,6 +21,7 @@ const DaoCard = ({ item }: any) => {
   }
   return (
     <div className="rounded-lg border border-gray-200 p-4 dark:border-gray-800">
+
       <img
         src={`${profilepic}?string=${Math.random()}`}
         alt="profile"
@@ -27,7 +29,9 @@ const DaoCard = ({ item }: any) => {
       />
       <p className="font-bold">{item?.username} </p>
       <p className="text-xs">Score : 87%</p>
-      <p className="text-xs">User since {dayjs(item.created_at).format("DD MMMM YYYY")}</p>
+      <p className="text-xs">
+        User since {dayjs(item.created_at).format("DD MMMM YYYY")}
+      </p>
     </div>
   )
 }
@@ -42,6 +46,8 @@ export const Members = () => {
       setAccounts(data)
     })()
   }, [])
+
+  const [userData, setUserData] = useState(null)
 
   return (
     <>
@@ -64,9 +70,19 @@ export const Members = () => {
         </div>
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
           {accounts.map((item: any) => (
-            <DaoCard key={item.id} item={item} />
+            <div
+              className="cursor-pointer"
+              onClick={() => {
+                setUserData(item?.dao_info)
+              }}
+            >
+              <DaoCard key={item.id} item={item} />
+            </div>
           ))}
         </div>
+        <ShowUserInfo data={userData} open={Boolean(userData)} onClose={()=>{
+          setUserData(null)
+        }} />
       </div>
     </>
   )

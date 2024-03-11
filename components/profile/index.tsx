@@ -33,6 +33,7 @@ import { logout } from "../../redux/userSlice"
 import { EditLocation } from "./editLocation"
 import { EditProfilePicture } from "./editProfilePicture"
 import { EditUsername } from "./editUsername"
+import { EditAboutMe } from "./editAboutme"
 
 export const Profile = () => {
   const { email = "" } = useSelector((state: any) => state?.user) ?? {}
@@ -45,6 +46,7 @@ export const Profile = () => {
   const [usernameModalOpen, setUsernameModalOpen] = useState(false)
   const [profilePictureModalOpen, setProfilePictureModalOpen] = useState(false)
   const [locationModalOpen, setLocationModalOpen] = useState(false)
+  const [introduceModalOpen, setIntroduceModalOpen] = useState(false)
 
   const fetchStamps = useCallback(async () => {
     if (email) {
@@ -206,6 +208,15 @@ export const Profile = () => {
                     {editButton({
                       onClick: () => {
                         setLocationModalOpen(true)
+                      },
+                    })}
+                  </div>
+                  <p>About Me</p>
+                  <div className="flex items-center space-x-2">
+                    <p>{supabaseUser?.dao_info?.introduce}</p>
+                    {editButton({
+                      onClick: () => {
+                        setIntroduceModalOpen(true)
                       },
                     })}
                   </div>
@@ -380,6 +391,16 @@ export const Profile = () => {
           open={profilePictureModalOpen}
           onClose={() => {
             setProfilePictureModalOpen(false)
+          }}
+        />
+        <EditAboutMe
+          fetchUser={() => {
+            setIntroduceModalOpen(false)
+            fetchUser?.()
+          }}
+          open={introduceModalOpen}
+          onClose={() => {
+            setIntroduceModalOpen(false)
           }}
         />
       </div>
