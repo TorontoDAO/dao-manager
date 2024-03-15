@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import React, { useCallback, useEffect, useState } from "react"
 import axios from "axios"
+import { Stamps } from "components/stamps"
 import { useDispatch, useSelector } from "react-redux"
 import { toast } from "react-toastify"
 
@@ -30,10 +31,10 @@ import {
 } from "@/components/ui/sheet"
 
 import { logout } from "../../redux/userSlice"
+import { EditAboutMe } from "./editAboutme"
 import { EditLocation } from "./editLocation"
 import { EditProfilePicture } from "./editProfilePicture"
 import { EditUsername } from "./editUsername"
-import { EditAboutMe } from "./editAboutme"
 
 export const Profile = () => {
   const { email = "" } = useSelector((state: any) => state?.user) ?? {}
@@ -141,14 +142,14 @@ export const Profile = () => {
 
   const editButton = ({ onClick }: any) => {
     return (
-      <button onClick={onClick} className="dark:text-white text-black">
+      <button onClick={onClick} className="text-black dark:text-white">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
           stroke-width="1.5"
           stroke="currentColor"
-          className="w-3 h-3"
+          className="size-3"
         >
           <path
             stroke-linecap="round"
@@ -159,6 +160,8 @@ export const Profile = () => {
       </button>
     )
   }
+
+  const [stampPanelOpen, setStampPanelOpen] = useState(false)
 
   return (
     <div className="p-3">
@@ -178,7 +181,7 @@ export const Profile = () => {
                     <img
                       src={`${profilePic}?string=${Math.random()}`}
                       alt="profile"
-                      className="mb-2 size-14 border border-gray-600 rounded-full"
+                      className="mb-2 size-14 rounded-full border border-gray-600"
                     />
                     {editButton({
                       onClick: () => {
@@ -227,13 +230,29 @@ export const Profile = () => {
         </Card>
         <Card style={{ height: "auto" }}>
           <CardHeader>
-            <CardTitle>My Trust Score</CardTitle>
+            <CardTitle>My Torontonian Score</CardTitle>
             <CardDescription>
-              Trust score in cubid is a proof of trust
+              We aggregate all the data points you've provided to score "how
+              Torontonian" you are.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl">87%</p>
+            <p className="translate-y-[-10px]">
+              Your score can be used in the future to determine your membership
+              tier among other things. We also use it to make sure our members
+              are real humans and not bots. You can increase your score by
+              adding more "stamps" here.
+            </p>
+            <div className="flex items-center justify-between">
+              <p className="text-2xl">87%</p>
+              <Button
+                onClick={() => {
+                  setStampPanelOpen(true)
+                }}
+              >
+                Add
+              </Button>
+            </div>
           </CardContent>
         </Card>
         <Card>
@@ -320,21 +339,31 @@ export const Profile = () => {
                 />
                 <p>Enabled Login</p>
               </div>
+              <Button
+                onClick={() => {
+                  dispatch(logout())
+                }}
+              >
+                Logout
+              </Button>
             </div>
           </CardContent>
         </Card>
-
-        <Card style={{ height: "fit-content", paddingTop: "15px" }}>
-          <CardContent>
-            <Button
-              onClick={() => {
-                dispatch(logout())
-              }}
-            >
-              Logout
-            </Button>
-          </CardContent>
-        </Card>
+        <Sheet
+          open={stampPanelOpen}
+          onOpenChange={(value) => {
+            if (value === false) {
+              setStampPanelOpen(false)
+            }
+          }}
+        >
+          <SheetContent className="!w-[100vw] !min-w-[100vw] !max-w-[100vw]">
+            <SheetHeader>
+              <SheetTitle>Add Stamps</SheetTitle>
+            </SheetHeader>
+            <Stamps />
+          </SheetContent>
+        </Sheet>
         <Sheet
           open={Boolean(exportPrivateKey)}
           onOpenChange={(value) => {
@@ -343,24 +372,24 @@ export const Profile = () => {
             }
           }}
         >
+          <SheetHeader>
+            <SheetTitle>Export Private Key</SheetTitle>
+          </SheetHeader>
           <SheetContent>
-            <SheetHeader>
-              <SheetTitle>Export Private Key</SheetTitle>
-              <p className="break-all">Copy Private Key : {exportPrivateKey}</p>
-              <p>
-                Copy they key if you want to import it to any other Near-wallet.
-              </p>
-              <Button
-                className="block"
-                onClick={() => {
-                  navigator.clipboard.writeText(exportPrivateKey as any)
-                  toast.success("Successfully copied private key")
-                }}
-                variant="outline"
-              >
-                Copy
-              </Button>
-            </SheetHeader>
+            <p className="break-all">Copy Private Key : {exportPrivateKey}</p>
+            <p>
+              Copy they key if you want to import it to any other Near-wallet.
+            </p>
+            <Button
+              className="block"
+              onClick={() => {
+                navigator.clipboard.writeText(exportPrivateKey as any)
+                toast.success("Successfully copied private key")
+              }}
+              variant="outline"
+            >
+              Copy
+            </Button>
           </SheetContent>
         </Sheet>
         <EditUsername

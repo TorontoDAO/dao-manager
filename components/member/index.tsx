@@ -118,8 +118,8 @@ export const Members = () => {
               marginTop: 10,
               marginBottom: 10,
             }}
-            center={{ lat: 0, lng: 0 }}
-            zoom={2}
+            center={{ lat:43.6532  , lng: -79.3832 }}
+            zoom={9}
             onLoad={onLoad}
             onUnmount={onUnmount}
           >
