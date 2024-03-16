@@ -331,7 +331,7 @@ export const Profile = () => {
           <CardContent>
             <div>
               <p>Email : {email} </p>
-              <div className="mt-2 flex items-center gap-2">
+              <div className="my-2 flex items-center gap-2">
                 <img
                   alt="image"
                   className="size-20 rounded"
@@ -343,6 +343,7 @@ export const Profile = () => {
                 onClick={() => {
                   dispatch(logout())
                 }}
+                className="mt-2"
               >
                 Logout
               </Button>

@@ -1,6 +1,7 @@
 /* eslint-disable tailwindcss/migration-from-tailwind-2 */
 // @ts-nocheck
 import React, { useCallback, useState } from "react"
+import { GoogleMap, MarkerF, useJsApiLoader } from "@react-google-maps/api"
 import axios from "axios"
 import _ from "lodash"
 import { useForm } from "react-hook-form"
@@ -29,6 +30,10 @@ export function UserProfileForm({ fetchUser }: any) {
     watch,
     formState: { errors },
   } = useForm()
+  const { isLoaded } = useJsApiLoader({
+    id: "google-map-script",
+    googleMapsApiKey: "AIzaSyCH9P8gyasf9bIWxk6bXUnk833jqyQudwI",
+  })
   const location = watch("location")
   const formValues = watch()
   const [locationError, setLocationError] = useState("")
@@ -40,6 +45,10 @@ export function UserProfileForm({ fetchUser }: any) {
   const { supabaseUser } = useAuth({})
   const [showWelcomeMessage, setShowWelcomeMessage] = useState(false)
   const [steps, setStep] = useState(0)
+
+  const [locationSelectionType, setLocationSelectionType] = useState("gps")
+
+  const [pincodeSearchVal, setPincodeSearchVal] = useState('')
 
   const onSubmit = async (data: any) => {
     await axios.post("/api/supabase/update", {
@@ -69,7 +78,7 @@ export function UserProfileForm({ fetchUser }: any) {
 
   const getLocation = () => {
     if (!navigator.geolocation) {
-      setShowLocationSearch(true)
+      setLocationSelectionType("google")
       setLocationError("Geolocation is not supported by your browser")
       return
     }
@@ -78,18 +87,18 @@ export function UserProfileForm({ fetchUser }: any) {
       const latitude = position.coords.latitude
       const longitude = position.coords.longitude
       if (!Boolean(latitude)) {
-        setShowLocationSearch(true)
+        setLocationSelectionType("google")
       } else {
         setValue("location", { latitude, longitude })
       }
     }
 
     function error() {
-      setShowLocationSearch(true)
+      setLocationSelectionType("google")
       setLocationError("Unable to retrieve your location")
     }
     if (!navigator?.geolocation?.getCurrentPosition) {
-      setShowLocationSearch(true)
+      setLocationSelectionType("google")
     }
     navigator.geolocation.getCurrentPosition(success, error)
   }
@@ -145,11 +154,45 @@ export function UserProfileForm({ fetchUser }: any) {
     debouncedFetchPlaces(text)
   }
 
+  const [pincodeResults, setPincodeResults] = useState([])
+
+  const fetchPincode = useCallback(async (searchQuery) => {
+    if (!searchQuery) {
+      setPincodeResults([])
+      return
+    }
+
+    try {
+      const response = await axios.post(`/api/supabase/select`, {
+        table: "postal_zip_codes",
+        match: {
+          postal_or_zip_code: searchQuery,
+          country: "canada",
+        },
+      })
+
+      if (response.data.data) {
+        setPincodeResults(response.data.data ?? [])
+      }
+    } catch (error) {
+      console.error("Error fetching data: ", error)
+      setPincodeResults([])
+    }
+  }, [])
+
+  const debounceFetchPincode = useCallback(_.debounce(fetchPincode, 300), [])
+
+  const handlePostalCodeSearch = (text: string) => {
+    setPincodeSearchVal(text)
+    setLocation(null)
+    debounceFetchPincode(text)
+  }
+
   if (showWelcomeMessage) {
     return (
       <div className="mt-2">
         <hr className="my-1" />
-        <p className="font-bold my-2">
+        <p className="my-2 font-bold">
           On the next page you can opt in to provide more information about
           yourself in the form of “stamps” which will increase your score. This
           information will not be shown to anyone else (unless you explicitly
@@ -157,7 +200,7 @@ export function UserProfileForm({ fetchUser }: any) {
           calculate an experimental “humanity score.” This score is the only
           thing other members will see
         </p>
-        <p className="text-xs animate-pulse">
+        <p className="animate-pulse text-xs">
           Redirecting you to the dashboard in 10 seconds
         </p>
       </div>
@@ -171,7 +214,7 @@ export function UserProfileForm({ fetchUser }: any) {
           Thanks. Now choose a a username, a profile picture and your
           approximate location. This information will be public to all members.
         </p>
-        <p className="italic text-sm">
+        <p className="text-sm italic">
           We don’t store your exact location. We round it to the nearest decimal
           place of both longitude and latitude, which is approx +\- 1km.{" "}
         </p>
@@ -316,7 +359,25 @@ export function UserProfileForm({ fetchUser }: any) {
           </div>
 
           <div>
-            {!showLocationSearch && (
+            <label
+              for="location"
+              className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Location Selection
+            </label>
+            <select
+              id="location"
+              value={locationSelectionType}
+              onChange={(e) => {
+                setLocationSelectionType(e.target.value)
+              }}
+              className="mb-4 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+            >
+              <option value="gps">Auto Detect via GPS</option>
+              <option value="google">Search Your Location via Google</option>
+              <option value="manual">Enter Your Postcode Manually</option>
+            </select>
+            {locationSelectionType === "gps" && (
               <>
                 <label
                   htmlFor="location"
@@ -337,7 +398,7 @@ export function UserProfileForm({ fetchUser }: any) {
                 </button>
               </>
             )}
-            {showLocationSearch && (
+            {locationSelectionType === "google" && (
               <>
                 <label
                   htmlFor="location"
@@ -386,6 +447,69 @@ export function UserProfileForm({ fetchUser }: any) {
                       </p>
                     </div>
                   ))}
+                </div>
+              </>
+            )}
+            {locationSelectionType === "manual" && (
+              <>
+                <label
+                  htmlFor="pincode"
+                  className="text-md block font-medium dark:text-gray-100"
+                >
+                  Pincode <span className="text-xs">(enter a 3 letter pincode)</span>
+                </label>
+                <input
+                  id="location"
+                  type="text"
+                  value={pincodeSearchVal}
+                  onChange={(e) => {
+                    handlePostalCodeSearch(e.target.value.toLocaleUpperCase())
+                  }}
+                  className="mt-1 block w-full rounded-md border border-gray-600 px-3 py-2 shadow-sm dark:bg-black dark:text-white sm:text-sm"
+                />
+                <div className="mt-2 grid grid-cols-1 md:grid-cols-3">
+                  {pincodeResults.map((item) => {
+                    console.log(item)
+                    return (
+                      <div
+                        onClick={() => {
+                          setLocation(item)
+                          setValue(
+                            "location",
+                            extractLatLong({
+                              latitude: item.lat,
+                              longitude: item.lng,
+                            })
+                          )
+                        }}
+                        className={`w-full text-xs ${
+                          item.id === locationSelected?.id
+                            ? "border-blue-500"
+                            : "bg-opacity-90"
+                        } rounded-md border-2 p-2`}
+                        key={item.id}
+                      >
+                        {isLoaded && (
+                          <GoogleMap
+                            mapContainerStyle={{
+                              width: "100%",
+                              height: "200px",
+                              borderRadius: 5,
+                            }}
+                            center={{ lat: item.lat ?? 0, lng: item.lng ?? 0 }}
+                            zoom={10}
+                          >
+                            <MarkerF
+                              position={{
+                                lat: item.lat ?? 0,
+                                lng: item.lng ?? 0,
+                              }}
+                            />
+                          </GoogleMap>
+                        )}
+                      </div>
+                    )
+                  })}
                 </div>
               </>
             )}
