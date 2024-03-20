@@ -516,6 +516,9 @@ export function UserProfileForm({ fetchUser }: any) {
                     pincodeResults.length === 0 && (
                       <p>Not a valid postal code</p>
                     )}
+                  {pincodeResults.length !== 0 && (
+                    <p>Please select a location</p>
+                  )}
                   {pincodeResults.map((item) => {
                     console.log(item)
                     return (
