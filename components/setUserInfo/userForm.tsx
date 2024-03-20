@@ -48,7 +48,7 @@ export function UserProfileForm({ fetchUser }: any) {
 
   const [locationSelectionType, setLocationSelectionType] = useState("gps")
 
-  const [pincodeSearchVal, setPincodeSearchVal] = useState('')
+  const [pincodeSearchVal, setPincodeSearchVal] = useState("")
 
   const onSubmit = async (data: any) => {
     await axios.post("/api/supabase/update", {
@@ -381,6 +381,7 @@ export function UserProfileForm({ fetchUser }: any) {
               <>
                 <label
                   htmlFor="location"
+                  d
                   className="text-md block font-medium dark:text-gray-100"
                 >
                   Approx. location is required
@@ -416,37 +417,77 @@ export function UserProfileForm({ fetchUser }: any) {
                   className="mt-1 block w-full rounded-md border border-gray-600 px-3 py-2 shadow-sm dark:bg-black dark:text-white sm:text-sm"
                 />
                 <div className="mt-3 space-y-1">
-                  {results.map((item: any) => (
-                    <div
-                      onClick={() => {
-                        console.log(item)
-                        setLocation(item)
-                        setValue(
-                          "location",
-                          extractLatLong({
-                            latitude: item.geometry.location.lat,
-                            longitude: item.geometry.location.lng,
-                          })
+                  {locationSelected?.place_id ? (
+                    <>
+                      {results.map((item: any) =>
+                        locationSelected?.place_id === item.place_id ? (
+                          <div
+                            onClick={() => {
+                              console.log(item)
+                              setLocation(item)
+                              setValue(
+                                "location",
+                                extractLatLong({
+                                  latitude: item.geometry.location.lat,
+                                  longitude: item.geometry.location.lng,
+                                })
+                              )
+                            }}
+                            className={`w-full p-2 text-xs ${
+                              item.place_id === locationSelected?.place_id
+                                ? ""
+                                : "bg-opacity-90"
+                            } rounded-md border-2`}
+                            key={item.place_id}
+                          >
+                            <p
+                              className={` ${
+                                item.place_id === locationSelected?.place_id
+                                  ? "font-bold"
+                                  : "font-light"
+                              }`}
+                            >
+                              {item.formatted_address}
+                            </p>
+                          </div>
+                        ) : (
+                          <></>
                         )
-                      }}
-                      className={`w-full p-2 text-xs ${
-                        item.place_id === locationSelected?.place_id
-                          ? ""
-                          : "bg-opacity-90"
-                      } rounded-md border-2`}
-                      key={item.place_id}
-                    >
-                      <p
-                        className={` ${
+                      )}
+                    </>
+                  ) : (
+                    results.map((item: any) => (
+                      <div
+                        onClick={() => {
+                          console.log(item)
+                          setLocation(item)
+                          setValue(
+                            "location",
+                            extractLatLong({
+                              latitude: item.geometry.location.lat,
+                              longitude: item.geometry.location.lng,
+                            })
+                          )
+                        }}
+                        className={`w-full p-2 text-xs ${
                           item.place_id === locationSelected?.place_id
-                            ? "font-bold"
-                            : "font-light"
-                        }`}
+                            ? ""
+                            : "bg-opacity-90"
+                        } rounded-md border-2`}
+                        key={item.place_id}
                       >
-                        {item.formatted_address}
-                      </p>
-                    </div>
-                  ))}
+                        <p
+                          className={` ${
+                            item.place_id === locationSelected?.place_id
+                              ? "font-bold"
+                              : "font-light"
+                          }`}
+                        >
+                          {item.formatted_address}
+                        </p>
+                      </div>
+                    ))
+                  )}
                 </div>
               </>
             )}
@@ -456,7 +497,10 @@ export function UserProfileForm({ fetchUser }: any) {
                   htmlFor="pincode"
                   className="text-md block font-medium dark:text-gray-100"
                 >
-                  Pincode <span className="text-xs">(enter a 3 letter pincode)</span>
+                  Postal Code{" "}
+                  <span className="text-xs">
+                    (enter a 3 letter postal code)
+                  </span>
                 </label>
                 <input
                   id="location"
@@ -468,6 +512,10 @@ export function UserProfileForm({ fetchUser }: any) {
                   className="mt-1 block w-full rounded-md border border-gray-600 px-3 py-2 shadow-sm dark:bg-black dark:text-white sm:text-sm"
                 />
                 <div className="mt-2 grid grid-cols-1 md:grid-cols-3">
+                  {pincodeSearchVal.length === 3 &&
+                    pincodeResults.length === 0 && (
+                      <p>Not a valid postal code</p>
+                    )}
                   {pincodeResults.map((item) => {
                     console.log(item)
                     return (

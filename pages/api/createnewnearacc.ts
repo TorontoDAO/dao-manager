@@ -129,7 +129,7 @@ export default async function handler(
     }
     const dataToSet = {
       created_by_user_id: userId,
-      created_by_app: 22,
+      created_by_app: 29,
       stamptype: 15,
       uniquevalue: `${accountToCreate}.near`,
       unique_hash: await encode_data(`${accountToCreate}.near`),

@@ -1,3 +1,4 @@
+/* eslint-disable tailwindcss/migration-from-tailwind-2 */
 // @ts-nocheck
 import React, { useCallback, useState } from "react"
 import axios from "axios"

@@ -279,7 +279,7 @@ export const Profile = () => {
                   {item}
                 </Button>
               ))}
-              {nearAcc.map((item) => (
+              {/* {nearAcc.map((item) => (
                 <div className="flex items-center justify-between">
                   <Button className="block" key={item} variant="outline">
                     {item}
@@ -301,7 +301,7 @@ export const Profile = () => {
                     </button>
                   )}
                 </div>
-              ))}
+              ))} */}
             </div>
           </CardContent>
         </Card>
@@ -342,6 +342,7 @@ export const Profile = () => {
               <Button
                 onClick={() => {
                   dispatch(logout())
+                  window.location.href = window.location.origin
                 }}
                 className="mt-2"
               >
@@ -358,39 +359,11 @@ export const Profile = () => {
             }
           }}
         >
-          <SheetContent className="!w-[100vw] !min-w-[100vw] !max-w-[100vw]">
+          <SheetContent className="!w-[100vw] !min-w-[100vw] !max-w-[100vw] overflow-y-scroll">
             <SheetHeader>
               <SheetTitle>Add Stamps</SheetTitle>
             </SheetHeader>
             <Stamps />
-          </SheetContent>
-        </Sheet>
-        <Sheet
-          open={Boolean(exportPrivateKey)}
-          onOpenChange={(value) => {
-            if (value === false) {
-              setExportPrivateKey(undefined)
-            }
-          }}
-        >
-          <SheetHeader>
-            <SheetTitle>Export Private Key</SheetTitle>
-          </SheetHeader>
-          <SheetContent>
-            <p className="break-all">Copy Private Key : {exportPrivateKey}</p>
-            <p>
-              Copy they key if you want to import it to any other Near-wallet.
-            </p>
-            <Button
-              className="block"
-              onClick={() => {
-                navigator.clipboard.writeText(exportPrivateKey as any)
-                toast.success("Successfully copied private key")
-              }}
-              variant="outline"
-            >
-              Copy
-            </Button>
           </SheetContent>
         </Sheet>
         <EditUsername

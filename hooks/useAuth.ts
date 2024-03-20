@@ -88,7 +88,7 @@ export const useAuth = (appHookProps: hookProps) => {
             table: "users",
             body: {
               is_3rd_party: true,
-              created_by_app: appId,
+              created_by_app: 29,
               email: searchParams.get("email"),
             },
           })

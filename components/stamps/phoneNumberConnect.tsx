@@ -64,7 +64,7 @@ export const PhoneNumberConnect = ({
       }
       const dataToSet = {
         created_by_user_id: dbUser?.id,
-        created_by_app:await getIdForApp(),
+        created_by_app: 29,
         stamptype: stampId,
         uniquevalue: phoneInput,
         user_id_and_uniqueval:`${dbUser?.id} ${stampId} ${phoneInput}`,

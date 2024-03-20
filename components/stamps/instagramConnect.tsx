@@ -85,7 +85,7 @@ export const InstagramConnect = ({
           }
           const dataToSet: any = {
             created_by_user_id: dbUser?.id,
-            created_by_app: await getIdForApp(),
+            created_by_app: 29,
             stamptype: stampId,
             uniquevalue: allData.id,
             user_id_and_uniqueval: `${dbUser?.id} ${stampId} ${allData.id}`,

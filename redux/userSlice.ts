@@ -9,6 +9,7 @@ export const userSlice = createSlice({
     login: (state: any, action: any) => action.payload,
     logout: () => {
       signOut(firebase.auth())
+      // window.location.href = window.location.origin;
       return null
     },
   },

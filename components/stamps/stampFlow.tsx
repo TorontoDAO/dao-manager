@@ -324,7 +324,7 @@ export const Stamps = ({
         }
         const dataToSet = {
           created_by_user_id: dbUser?.id,
-          created_by_app: await getIdForApp(),
+          created_by_app: 29,
           stamptype: stampId,
           uniquevalue: user_metadata?.email,
           user_id_and_uniqueval: `${dbUser?.id} ${stampId} ${user_metadata?.email}`,
@@ -393,7 +393,7 @@ export const Stamps = ({
         }
         const dataToSet = {
           created_by_user_id: dbUser?.id,
-          created_by_app: await getIdForApp(),
+          created_by_app: 29,
           stamptype: stampId,
           uniquevalue: (wallet as any).accountId,
           user_id_and_uniqueval: `${dbUser?.id} ${stampId} ${
@@ -474,7 +474,7 @@ export const Stamps = ({
           body: {
             created_by_user_id: ((await getUser()) as any).id,
             stamptype: 17,
-            created_by_app: appId,
+            created_by_app: 29,
             stamp_json: kyc_fractal,
             user_id_and_uniqueval: `${((await getUser()) as any).id} 17 ${uid}`,
             uniquevalue: uid,
