@@ -82,12 +82,18 @@ export default function IndexPage() {
               setTab(val)
             }}
           >
-            <TabsContent style={{ height: "100vh" }} value="profile">
+            <TabsContent
+              style={{ minHeight: "100vh", paddingBottom: "100px" }}
+              value="profile"
+            >
               <div>
                 <Profile />
               </div>
             </TabsContent>
-            <TabsContent style={{ height: "100vh" }} value="members">
+            <TabsContent
+              style={{ minHeight: "100vh", paddingBottom: "100px" }}
+              value="members"
+            >
               <div>
                 <Members />
               </div>
@@ -139,5 +145,9 @@ export default function IndexPage() {
       </WagmiConfig>
     )
   }
-  return <></>
+  return (
+    <>
+      <p className="p-2 animate-pulse">Loading Your Profile</p>
+    </>
+  )
 }

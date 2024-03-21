@@ -59,7 +59,7 @@ export const ShowUserInfo = ({ data, open, onClose }: any) => {
   return (
     <>
       <Sheet open={open} onOpenChange={onClose}>
-        <SheetContent className="w-[400px] sm:w-[540px]">
+        <SheetContent className="w-[400px] overflow-y-scroll sm:w-[540px]">
           <SheetHeader>
             <SheetTitle>{data?.username}</SheetTitle>
           </SheetHeader>

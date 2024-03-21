@@ -89,7 +89,13 @@ export function UserProfileForm({ fetchUser }: any) {
       if (!Boolean(latitude)) {
         setLocationSelectionType("google")
       } else {
-        setValue("location", { latitude, longitude })
+        function roundToOneDecimal(floatNumber) {
+          return Math.round(floatNumber * 10) / 10
+        }
+        setValue("location", {
+          latitude: roundToOneDecimal(latitude),
+          longitude: roundToOneDecimal(longitude),
+        })
       }
     }
 
@@ -214,11 +220,7 @@ export function UserProfileForm({ fetchUser }: any) {
           Thanks. Now choose a a username, a profile picture and your
           approximate location. This information will be public to all members.
         </p>
-        <p className="text-sm italic">
-          We don’t store your exact location. We round it to the nearest decimal
-          place of both longitude and latitude, which is approx +\- 1km.{" "}
-        </p>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
           <div>
             <label
               htmlFor="username"
@@ -365,6 +367,11 @@ export function UserProfileForm({ fetchUser }: any) {
             >
               Location Selection
             </label>
+            <p className="text-sm my-2 italic">
+              We don’t store your exact location. We round it to the nearest
+              decimal place of both longitude and latitude, which is approx +\-
+              1km.{" "}
+            </p>
             <select
               id="location"
               value={locationSelectionType}

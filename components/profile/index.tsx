@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import React, { useCallback, useEffect, useState } from "react"
+import { GoogleMap, MarkerF, useJsApiLoader } from "@react-google-maps/api"
 import axios from "axios"
 import { Stamps } from "components/stamps"
 import { useDispatch, useSelector } from "react-redux"
@@ -43,6 +44,10 @@ export const Profile = () => {
   const [walletState, setWalletState] = useState<any>({})
   const [exportPrivateKey, setExportPrivateKey] = useState(undefined)
   const [profilePic, setProfilePic] = useState("")
+  const { isLoaded } = useJsApiLoader({
+    id: "google-map-script",
+    googleMapsApiKey: "AIzaSyCH9P8gyasf9bIWxk6bXUnk833jqyQudwI",
+  })
 
   const [usernameModalOpen, setUsernameModalOpen] = useState(false)
   const [profilePictureModalOpen, setProfilePictureModalOpen] = useState(false)
@@ -190,31 +195,53 @@ export const Profile = () => {
                     })}
                   </div>
                   <div className="flex items-center space-x-2">
-                    <p>Username : {supabaseUser?.dao_info?.username} </p>
+                    <p>
+                      <span className="font-semibold">Username</span> <br />{" "}
+                      {supabaseUser?.dao_info?.username}{" "}
+                    </p>
                     {editButton({
                       onClick: () => {
                         setUsernameModalOpen(true)
                       },
                     })}
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="">
                     <p>
-                      Location : Latitude :{" "}
-                      {roundToOneDecimal(
-                        supabaseUser?.dao_info?.location.latitude
-                      )}{" "}
-                      Longitude :{" "}
-                      {roundToOneDecimal(
-                        supabaseUser?.dao_info?.location.longitude
-                      )}
+                      <span className="font-semibold">Location</span>
                     </p>
-                    {editButton({
-                      onClick: () => {
-                        setLocationModalOpen(true)
-                      },
-                    })}
+                    <div className="mb-2 flex items-center space-x-2">
+                      {isLoaded && (
+                        <GoogleMap
+                          mapContainerStyle={{
+                            width: "90%",
+                            height: "200px",
+                            borderRadius: 5,
+                          }}
+                          center={{
+                            lat: supabaseUser?.dao_info?.location.latitude ?? 0,
+                            lng:
+                              supabaseUser?.dao_info?.location.longitude ?? 0,
+                          }}
+                          zoom={10}
+                        >
+                          <MarkerF
+                            position={{
+                              lat:
+                                supabaseUser?.dao_info?.location.latitude ?? 0,
+                              lng:
+                                supabaseUser?.dao_info?.location.longitude ?? 0,
+                            }}
+                          />
+                        </GoogleMap>
+                      )}
+                      {editButton({
+                        onClick: () => {
+                          setLocationModalOpen(true)
+                        },
+                      })}
+                    </div>
                   </div>
-                  <p>About Me</p>
+                  <p className="font-semibold">About Me</p>
                   <div className="flex items-center space-x-2">
                     <p>{supabaseUser?.dao_info?.introduce}</p>
                     {editButton({
@@ -305,7 +332,7 @@ export const Profile = () => {
             </div>
           </CardContent>
         </Card>
-        <Card style={{ height: "auto" }}>
+        {/* <Card style={{ height: "auto" }}>
           <CardHeader>
             <CardTitle>Language Preferences</CardTitle>
           </CardHeader>
@@ -322,7 +349,7 @@ export const Profile = () => {
               </SelectContent>
             </Select>
           </CardContent>
-        </Card>
+        </Card> */}
 
         <Card>
           <CardHeader>
