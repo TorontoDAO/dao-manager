@@ -184,15 +184,15 @@ export const EditLocation = ({ fetchUser,open,onClose }: any) => {
                 const {
                   data: { data },
                 } = await axios.post("/api/supabase/select", {
-                  table: "users",
-                  match: { id: supabaseUser?.id },
+                  table: "dapp_users",
+                  match: { user_id: supabaseUser?.id },
                 })
                 await axios.post("/api/supabase/update", {
-                  table: "users",
-                  match: { id: supabaseUser?.id },
+                  table: "dapp_users",
+                  match: { user_id: supabaseUser?.id },
                   body: {
-                    dao_info: {
-                      ...data?.[0]?.dao_info,
+                    user_data: {
+                      ...data?.[0]?.user_data,
                       location: locationVal,
                     },
                   },

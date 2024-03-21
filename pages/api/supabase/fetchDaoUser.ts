@@ -6,7 +6,7 @@ const searchUsername = async (req: NextApiRequest, res: NextApiResponse) => {
   const { username } = req.body
 
   const { error, data } = await supabase
-    .from("users")
+    .from("dapp_users")
     .select("*")
     .neq("username", null)
   res.send({ error, data })

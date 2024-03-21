@@ -46,6 +46,77 @@ export default function AuthenticationPage() {
           table: "users",
           body: { email: localStorage.getItem("email") },
         })
+        const {
+          data: { data: newData },
+        } = await axios.post("/api/supabase/select", {
+          match: { email: emailField.current.value },
+          table: "users",
+        })
+        await axios.post(`/api/supabase/insert`, {
+          table: "dapp_users",
+          body: {
+            email: localStorage.getItem("email"),
+            user_id: newData?.[0]?.id,
+            is_authorized: true,
+            dapp_id: 29,
+          },
+        })
+
+        const {
+          data: { data: dappUserData },
+        } = await axios.post("/api/supabase/select", {
+          match: { dapp_id: 29, user_id: newData?.[0]?.id },
+          table: "users",
+        })
+
+        const database = {
+          uniquehash: await encode_data(address),
+          stamptype: 13,
+          created_by_user_id: newData?.[0]?.id,
+          unencrypted_unique_data: emailField.current.value,
+          type_and_hash: `${stampId} ${await encode_data(
+            emailField.current.value
+          )}`,
+        }
+        const dataToSet = {
+          created_by_user_id: newData?.[0]?.id,
+          created_by_app: 29,
+          stamptype: 13,
+          uniquevalue: emailField.current.value,
+          user_id_and_uniqueval: `${dbUser?.id} 13 ${emailField.current.value}`,
+          unique_hash: await encode_data(emailField.current.value),
+          stamp_json: { email: emailField.current.value },
+          type_and_uniquehash: `13 ${await encode_data(
+            emailField.current.value
+          )}`,
+        }
+        await axios.post("/api/supabase/insert", {
+          table: "uniquestamps",
+          body: database,
+        })
+        const {
+          data: { error, data: stampData },
+        } = await axios.post("/api/supabase/insert", {
+          table: "stamps",
+          body: dataToSet,
+        })
+        await axios.post("/api/supabase/insert", {
+          match: { dappuser_id: dappUserData?.[0]?.id, stamp_id: stampData?.[0]?.id, },
+          table: "stamp_dappuser_permissions",
+        })
+        if (stampData?.[0]?.id) {
+          await axios.post("/api/supabase/insert", {
+            table: "authorized_dapps",
+            body: {
+              dapp_id: 29,
+              dapp_and_stamp_id: `29 ${stampData?.[0]?.id}`,
+              stamp_id: stampData?.[0]?.id,
+              can_read: true,
+              can_update: true,
+              can_delete: true,
+            },
+          })
+        }
       }
       // axios.post('/api/login-create-user',{
       //   email
@@ -80,9 +151,7 @@ export default function AuthenticationPage() {
             </svg>
             Toronto DAO
           </div>
-          <div className="relative z-20 mt-auto">
-
-          </div>
+          <div className="relative z-20 mt-auto"></div>
         </div>
         <div className="lg:p-8">
           <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">

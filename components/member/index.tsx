@@ -11,10 +11,10 @@ import { ShowUserInfo } from "./showUserInfo"
 const DaoCard = ({ item }: any) => {
   const [profilepic, setProfilePic] = useState("")
   useEffect(() => {
-    if (item?.dao_info?.profile_pic) {
+    if (item?.user_data?.profile_pic) {
       const { data } = supabase.storage
         .from("supabase-pfp")
-        .getPublicUrl(item?.dao_info?.profile_pic)
+        .getPublicUrl(item?.user_data?.profile_pic)
       setProfilePic(data?.publicUrl)
     }
   }, [item])
@@ -125,15 +125,15 @@ export const Members = () => {
           >
             {accounts.map((item: any) => {
               const isLocation =
-                item?.dao_info?.location?.latitude ||
-                (typeof item?.dao_info?.location === "string" &&
-                  item?.dao_info?.location.length !== 0)
+                item?.user_data?.location?.latitude ||
+                (typeof item?.user_data?.location === "string" &&
+                  item?.user_data?.location.length !== 0)
               return (
                 <>
                   {isLocation && (
                     <MarkerF
                       title={item?.username}
-                      position={extractLatLng(item?.dao_info?.location) as any}
+                      position={extractLatLng(item?.user_data?.location) as any}
                     />
                   )}
                 </>
@@ -146,7 +146,7 @@ export const Members = () => {
             <div
               className="cursor-pointer"
               onClick={() => {
-                setUserData(item?.dao_info)
+                setUserData(item?.user_data)
               }}
             >
               <DaoCard key={item.id} item={item} />

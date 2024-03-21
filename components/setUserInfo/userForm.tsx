@@ -7,6 +7,7 @@ import _ from "lodash"
 import { useForm } from "react-hook-form"
 
 import useAuth from "@/hooks/useAuth"
+import { Button } from "@/components/ui/button"
 
 import { supabase } from "../../lib/supabase"
 import { SetLocation } from "./setLocation"
@@ -52,12 +53,10 @@ export function UserProfileForm({ fetchUser }: any) {
 
   const onSubmit = async (data: any) => {
     await axios.post("/api/supabase/update", {
-      table: "users",
+      table: "dapp_users",
       body: {
-        user_info: {
+        user_data: {
           name: `${formValues.firstName} ${formValues.lastName}`,
-        },
-        dao_info: {
           profile_pic: profilePic,
           username: formValues?.username,
           location: formValues?.location,
@@ -67,13 +66,10 @@ export function UserProfileForm({ fetchUser }: any) {
         username: formValues?.username,
       },
       match: {
-        id: supabaseUser?.id,
+        user_id: supabaseUser?.id,
       },
     })
     setShowWelcomeMessage(true)
-    setTimeout(() => {
-      fetchUser()
-    }, 10000)
   }
 
   const getLocation = () => {
@@ -206,9 +202,13 @@ export function UserProfileForm({ fetchUser }: any) {
           calculate an experimental “humanity score.” This score is the only
           thing other members will see
         </p>
-        <p className="animate-pulse text-xs">
-          Redirecting you to the dashboard in 10 seconds
-        </p>
+        <Button
+          onClick={() => {
+            fetchUser?.()
+          }}
+        >
+          Ok
+        </Button>
       </div>
     )
   }
