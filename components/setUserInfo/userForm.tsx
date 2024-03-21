@@ -52,23 +52,48 @@ export function UserProfileForm({ fetchUser }: any) {
   const [pincodeSearchVal, setPincodeSearchVal] = useState("")
 
   const onSubmit = async (data: any) => {
-    await axios.post("/api/supabase/update", {
+    const {
+      data: { data: dappData },
+    } = await axios.post("/api/supabase/select", {
       table: "dapp_users",
-      body: {
-        user_data: {
-          name: `${formValues.firstName} ${formValues.lastName}`,
-          profile_pic: profilePic,
-          username: formValues?.username,
-          location: formValues?.location,
-          introduce: formValues?.introduce,
-          howdidyouhear: formValues?.howdidyouhear,
-        },
-        username: formValues?.username,
-      },
-      match: {
-        user_id: supabaseUser?.id,
-      },
+      match: { user_id: supabaseUser?.id },
     })
+    if (dappData?.[0]) {
+      await axios.post("/api/supabase/update", {
+        table: "dapp_users",
+        body: {
+          user_data: {
+            name: `${formValues.firstName} ${formValues.lastName}`,
+            profile_pic: profilePic,
+            username: formValues?.username,
+            location: formValues?.location,
+            introduce: formValues?.introduce,
+            howdidyouhear: formValues?.howdidyouhear,
+          },
+          username: formValues?.username,
+        },
+        match: {
+          user_id: supabaseUser?.id,
+        },
+      })
+    } else {
+      await axios.post("/api/supabase/insert", {
+        table: "dapp_users",
+        body: {
+          user_data: {
+            name: `${formValues.firstName} ${formValues.lastName}`,
+            profile_pic: profilePic,
+            username: formValues?.username,
+            location: formValues?.location,
+            introduce: formValues?.introduce,
+            howdidyouhear: formValues?.howdidyouhear,
+          },
+          username: formValues?.username,
+          user_id: supabaseUser?.id,
+          dapp_id: 29,
+        },
+      })
+    }
     setShowWelcomeMessage(true)
   }
 

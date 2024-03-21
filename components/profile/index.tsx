@@ -95,7 +95,7 @@ export const Profile = () => {
   const { supabaseUser, fetchUser } = useAuth({})
 
   useEffect(() => {
-    if (supabaseUser?.dao_info?.profile_pic) {
+    if (supabaseUser?.user_data?.profile_pic) {
       const { data } = supabase.storage
         .from("supabase-pfp")
         .getPublicUrl(supabaseUser?.user_data?.profile_pic)
