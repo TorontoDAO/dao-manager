@@ -15,3 +15,5 @@ Future features
 - mint your membership SBT on chain (self serve)
 - export your private keys to any other wallet
 - donate to the DAO and/or pay your membership fee via Stripe or with crypto
+
+Pull requests wanted. We welcome any help from the community with improving and enhancing this tool. Please see the Issues tab for specific ideas on what needs doing, or feel free to suggest your own idea.
