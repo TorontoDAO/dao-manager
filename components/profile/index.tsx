@@ -98,7 +98,7 @@ export const Profile = () => {
     if (supabaseUser?.dao_info?.profile_pic) {
       const { data } = supabase.storage
         .from("supabase-pfp")
-        .getPublicUrl(supabaseUser?.dao_info?.profile_pic)
+        .getPublicUrl(supabaseUser?.user_data?.profile_pic)
       setProfilePic(data?.publicUrl)
     }
   }, [supabaseUser])
@@ -179,7 +179,7 @@ export const Profile = () => {
             </div>
           </CardHeader>
           <CardContent>
-            {Boolean(supabaseUser?.dao_info?.username) && (
+            {Boolean(supabaseUser?.username) && (
               <>
                 <div>
                   <div className="flex items-center space-x-2">
@@ -197,7 +197,7 @@ export const Profile = () => {
                   <div className="flex items-center space-x-2">
                     <p>
                       <span className="font-semibold">Username</span> <br />{" "}
-                      {supabaseUser?.dao_info?.username}{" "}
+                      {supabaseUser?.username}{" "}
                     </p>
                     {editButton({
                       onClick: () => {
@@ -218,18 +218,18 @@ export const Profile = () => {
                             borderRadius: 5,
                           }}
                           center={{
-                            lat: supabaseUser?.dao_info?.location.latitude ?? 0,
+                            lat: supabaseUser?.user_data?.location.latitude ?? 0,
                             lng:
-                              supabaseUser?.dao_info?.location.longitude ?? 0,
+                              supabaseUser?.user_data?.location.longitude ?? 0,
                           }}
                           zoom={10}
                         >
                           <MarkerF
                             position={{
                               lat:
-                                supabaseUser?.dao_info?.location.latitude ?? 0,
+                                supabaseUser?.user_data?.location.latitude ?? 0,
                               lng:
-                                supabaseUser?.dao_info?.location.longitude ?? 0,
+                                supabaseUser?.user_data?.location.longitude ?? 0,
                             }}
                           />
                         </GoogleMap>
@@ -243,7 +243,7 @@ export const Profile = () => {
                   </div>
                   <p className="font-semibold">About Me</p>
                   <div className="flex items-center space-x-2">
-                    <p>{supabaseUser?.dao_info?.introduce}</p>
+                    <p>{supabaseUser?.user_data?.introduce}</p>
                     {editButton({
                       onClick: () => {
                         setIntroduceModalOpen(true)

@@ -60,7 +60,7 @@ export default function IndexPage() {
 
   useEffect(() => {
     if (
-      !supabaseUser?.dao_info &&
+      !supabaseUser?.user_data &&
       supabaseUser?.email &&
       userLoading === false
     ) {
@@ -72,7 +72,7 @@ export default function IndexPage() {
     return <></>
   }
 
-  if (supabaseUser?.dao_info && supabaseUser?.email && userLoading === false) {
+  if (supabaseUser?.user_data && supabaseUser?.email && userLoading === false) {
     return (
       <WagmiConfig config={wagmiConfig as any}>
         <Authenticated>

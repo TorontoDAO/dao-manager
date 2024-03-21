@@ -9,6 +9,7 @@ import axios from "axios"
 import { Guest } from "components/auth/guest"
 import firebase from "lib/firebase"
 import { toast } from "react-toastify"
+import { encode_data } from "@/lib/encode_data"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -49,13 +50,12 @@ export default function AuthenticationPage() {
         const {
           data: { data: newData },
         } = await axios.post("/api/supabase/select", {
-          match: { email: emailField.current.value },
+          match: { email: localStorage.getItem("email") },
           table: "users",
         })
         await axios.post(`/api/supabase/insert`, {
           table: "dapp_users",
           body: {
-            email: localStorage.getItem("email"),
             user_id: newData?.[0]?.id,
             is_authorized: true,
             dapp_id: 29,
@@ -70,24 +70,24 @@ export default function AuthenticationPage() {
         })
 
         const database = {
-          uniquehash: await encode_data(address),
+          uniquehash: await encode_data(localStorage.getItem("email")),
           stamptype: 13,
           created_by_user_id: newData?.[0]?.id,
-          unencrypted_unique_data: emailField.current.value,
-          type_and_hash: `${stampId} ${await encode_data(
-            emailField.current.value
+          unencrypted_unique_data: localStorage.getItem("email"),
+          type_and_hash: `13 ${await encode_data(
+            localStorage.getItem("email")
           )}`,
         }
         const dataToSet = {
           created_by_user_id: newData?.[0]?.id,
           created_by_app: 29,
           stamptype: 13,
-          uniquevalue: emailField.current.value,
-          user_id_and_uniqueval: `${dbUser?.id} 13 ${emailField.current.value}`,
-          unique_hash: await encode_data(emailField.current.value),
-          stamp_json: { email: emailField.current.value },
+          uniquevalue: localStorage.getItem("email"),
+          user_id_and_uniqueval: `${newData?.[0]?.id} 13 ${localStorage.getItem("email")}`,
+          unique_hash: await encode_data(localStorage.getItem("email")),
+          stamp_json: { email: localStorage.getItem("email") },
           type_and_uniquehash: `13 ${await encode_data(
-            emailField.current.value
+            localStorage.getItem("email")
           )}`,
         }
         await axios.post("/api/supabase/insert", {

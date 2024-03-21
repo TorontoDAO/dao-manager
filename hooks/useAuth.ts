@@ -39,27 +39,10 @@ export const useAuth = (appHookProps: hookProps) => {
         localStorage.removeItem("email")
         dispatch(logout())
       }
-      setLoading(false)
     })
 
     return () => unsubscribe()
   }, [dispatch])
-
-  useEffect(() => {
-    ;(async () => {
-      if (user?.email) {
-        const {
-          data: { data: dbData },
-        } = await axios.post("/api/supabase/select", {
-          table: "users",
-          match: {
-            email: localStorage.getItem("email") ?? user?.email,
-          },
-        })
-        setSupabaseUser(dbData?.[0])
-      }
-    })()
-  }, [user])
 
   const getUser = useCallback(async () => {
     if (!localStorage.getItem("unauthenticated_user")) {
@@ -130,8 +113,26 @@ export const useAuth = (appHookProps: hookProps) => {
         email: localStorage.getItem("email") ?? user?.email,
       },
     })
-    setSupabaseUser(dbData?.[0])
+    const {
+      data: { data: dappData },
+    } = await axios.post("/api/supabase/select", {
+      table: "dapp_users",
+      match: {
+        user_id: dbData?.[0]?.id,
+      },
+    })
+    setSupabaseUser({
+      ...dbData?.[0],
+      username: dappData?.[0]?.username,
+      user_data: dappData?.[0]?.user_data,
+    })
+    setLoading(false)
+
   }, [user?.email])
+
+  useEffect(() => {
+    fetchUser()
+  }, [fetchUser])
 
   return { loading, user, supabaseUser, getUser, fetchUser }
 }
