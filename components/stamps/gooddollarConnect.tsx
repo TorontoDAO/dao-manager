@@ -147,7 +147,7 @@ export const GooddollarConnect = ({
           }
           const dataToSet = {
             created_by_user_id: dbUser?.id,
-            created_by_app:await getIdForApp(),
+            created_by_app:29,
             stamptype: 12,
             uniquevalue: gooddollar_data["wallet-address"],
             unique_hash: await encode_data(gooddollar_data["wallet-address"]),

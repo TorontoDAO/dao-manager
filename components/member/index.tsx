@@ -29,7 +29,7 @@ const DaoCard = ({ item }: any) => {
         className="mb-2 size-14 rounded-full border border-gray-600 object-cover"
       />
       <p className="font-bold">{item?.username} </p>
-      <p className="text-xs">Score : Coming Soon</p>
+      <p className="text-xs">Score : {item.score}</p>
       <p className="text-xs">
         User since {dayjs(item.created_at).format("DD MMMM YYYY")}
       </p>

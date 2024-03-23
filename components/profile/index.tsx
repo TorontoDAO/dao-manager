@@ -53,6 +53,19 @@ export const Profile = () => {
   const [profilePictureModalOpen, setProfilePictureModalOpen] = useState(false)
   const [locationModalOpen, setLocationModalOpen] = useState(false)
   const [introduceModalOpen, setIntroduceModalOpen] = useState(false)
+  const [stampScore, setStampScore] = useState(0)
+  const { supabaseUser, fetchUser } = useAuth({})
+
+  useEffect(() => {
+    ;(async () => {
+      const {
+        data: { stampScore },
+      } = await axios.post(`/api/calculate_score`, {
+        user_id: supabaseUser?.id,
+      })
+      setStampScore(stampScore)
+    })()
+  }, [supabaseUser])
 
   const fetchStamps = useCallback(async () => {
     if (email) {
@@ -92,7 +105,6 @@ export const Profile = () => {
   const [nearAcc, setNearAcc] = useState([])
   const [allNearData, setAllNearData] = useState([])
   const [allEvmData, setAllEvmData] = useState([])
-  const { supabaseUser, fetchUser } = useAuth({})
 
   useEffect(() => {
     if (supabaseUser?.user_data?.profile_pic) {
@@ -218,7 +230,8 @@ export const Profile = () => {
                             borderRadius: 5,
                           }}
                           center={{
-                            lat: supabaseUser?.user_data?.location.latitude ?? 0,
+                            lat:
+                              supabaseUser?.user_data?.location.latitude ?? 0,
                             lng:
                               supabaseUser?.user_data?.location.longitude ?? 0,
                           }}
@@ -229,7 +242,8 @@ export const Profile = () => {
                               lat:
                                 supabaseUser?.user_data?.location.latitude ?? 0,
                               lng:
-                                supabaseUser?.user_data?.location.longitude ?? 0,
+                                supabaseUser?.user_data?.location.longitude ??
+                                0,
                             }}
                           />
                         </GoogleMap>
@@ -255,7 +269,7 @@ export const Profile = () => {
             )}
           </CardContent>
         </Card>
-        <Card style={{ height: "auto" }}>
+        <Card style={{ height: "fit-content" }}>
           <CardHeader>
             <CardTitle>My Torontonian Score</CardTitle>
             <CardDescription>
@@ -271,7 +285,7 @@ export const Profile = () => {
               adding more "stamps" here.
             </p>
             <div className="flex items-center justify-between">
-              <p className="text-2xl">87%</p>
+              <p className="text-2xl">Score : {stampScore}</p>
               <Button
                 onClick={() => {
                   setStampPanelOpen(true)
