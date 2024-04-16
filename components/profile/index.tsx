@@ -59,7 +59,7 @@ export const Profile = () => {
   useEffect(() => {
     ;(async () => {
       const {
-        data: { stampScore },
+        data:stampScore,
       } = await axios.post(`/api/calculate_score`, {
         user_id: supabaseUser?.id,
       })

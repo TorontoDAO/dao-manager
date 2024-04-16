@@ -1,66 +1,60 @@
-// @ts-nocheck
+import NextCors from "nextjs-cors"
 
-import { NextApiRequest, NextApiResponse } from "next"
+import { supabase } from "./utils/supabase"
 
-import { supabase } from "@/lib/supabase"
-
-function isInToronto(lat: number, lng: number) {
-  // Define the approximate bounding box of Toronto
-  const minLat = 43.5 // Minimum latitude observed
-  const maxLat = 43.8 // Maximum latitude observed
-  const minLng = 79.2 // Minimum longitude observed
-  const maxLng = 79.5 // Maximum longitude observed
-
-  if (lng > 0) {
-    return false
-  }
-
-  const lngToCompare = lng * -1
-
-  // Check if the given coordinates are within the bounding box
-  return lat > minLat && lat < maxLat && lngToCompare > minLng && lngToCompare < maxLng;
-}
-
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+const fetch_score = async (req: any, res: any) => {
+  await NextCors(req, res, {
+    // Options
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    origin: "*", // Allow all origins
+    optionsSuccessStatus: 200, // Some legacy browsers choke on 204
+  })
   const { user_id } = req.body
-  if (!user_id) {
-    res.status(200).json({
-      stampScore: 0,
+  const { data: dapp_users } = await supabase
+    .from("dapp_users")
+    .select("*,users:user_id(*),dapps:dapp_id(*)")
+    .match({
+      user_id,
     })
-  }
-  const { data: allStampScores } = await supabase
+  const { error, data: stampData } = await supabase
+    .from("dapp_stamptypes")
+    .select("*,stamptypes:stamptype_id(*)")
+    .match({
+      dapp_id: dapp_users?.[0]?.dapp_id,
+    })
+  const { data: scoreData } = await supabase
+    .from("stampscore_dapps")
+    .select("*,stampscore_schemas:schema_id(*)")
+    .match({
+      dapp_id: dapp_users?.[0]?.dapp_id,
+    })
+  const { data: stampScores } = await supabase
     .from("stampscores_available")
     .select("*")
-  const { data: userStamps } = await supabase.from("stamps").select("*").match({
-    created_by_user_id: user_id,
-    created_by_app: 29,
-  })
-  const { data: dappUserData } = await supabase
-    .from("dapp_users")
-    .select("*")
     .match({
-      user_id: user_id,
+      schema_id: scoreData?.[0]?.schema_id,
     })
-  const allStampTypes = userStamps?.map((item) => item.stamptype)
-  let stampScore = 0
-  allStampTypes?.map((_) => {
-    const scoreToAdd = allStampScores?.find(
-      (item) => item.stamptype_id === _
-    ).score
-    stampScore = stampScore + scoreToAdd
-  })
-  const isInsideToronto = isInToronto(
-    dappUserData[0].user_data.location.latitude,
-    dappUserData[0].user_data.location.longitude
-  )
-  if (isInsideToronto) {
-    stampScore = stampScore + 10
-  }
 
-  res.status(200).json({
-    stampScore,
+  const { data: stampsList } = await supabase.from("stamps").select("*").match({
+    created_by_user_id: dapp_users?.[0]?.user_id,
   })
+
+  const stampsToSend = stampData ?? []
+
+  const allStampIds = (stampsList ?? []).map((item: any) => item.stamptype)
+
+  const stampScore = [
+    ...stampsToSend.filter((item) =>
+      allStampIds?.includes(item?.stamptypes?.id)
+    ),
+  ].reduce((curr, item) => {
+    const scoreData = (stampScores ?? []).find(
+      (_) => _.stamptype_id === item.stamptype_id
+    )
+    const scoreToAdd = scoreData?.score ?? 0
+    return scoreToAdd + curr
+  }, 0)
+  res.send(stampScore)
 }
+
+export default fetch_score
