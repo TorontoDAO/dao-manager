@@ -94,6 +94,7 @@
         "viem": "^1.15.4",
         "wagmi": "^1.4.3",
         "web3": "^4.1.2",
+        "web3-eth-accounts": "^4.1.2",
         "web3-eth-contract": "^1.9.0"
     },
     "devDependencies": {
