@@ -1038,7 +1038,11 @@ export default async function handler(
     return Number(bigintValue)
   }
 
-  console.log({ data: bigintToInt(data),address },'mint call',bigintToInt(data) === 0)
+  console.log(
+    { data: bigintToInt(data), address },
+    "mint call",
+    bigintToInt(data) === 0
+  )
 
   if (bigintToInt(data) === 0) {
     const txData = contract.methods.safeMint(address).encodeABI()
@@ -1061,8 +1065,6 @@ export default async function handler(
     const receipt = await web3.eth.sendSignedTransaction(
       signedTx.rawTransaction
     )
-    console.log({receipt})
+    res.send({transactionHash:receipt.transactionHash})
   }
-
-  res.send(true)
 }

@@ -18,6 +18,7 @@ export const MintNft = () => {
   const [selectedAccToMint, setSelectedAccToMint] = useState<string | null>(
     null
   )
+  const [receiptData, setReceiptData] = useState<any>({})
   const [selectedAccHasNft, setSelectedAccHasNft] = useState<boolean | null>(
     null
   )
@@ -31,7 +32,7 @@ export const MintNft = () => {
     const { data }: any = await axios.post("/api/fetchnft", {
       address: selectedAccToMint,
     })
-    setSelectedAccHasNft(data?.hasNft)
+setSelectedAccHasNft(data?.hasNft)
     setSelectedAccLoading(false)
   }
 
@@ -221,10 +222,17 @@ export const MintNft = () => {
 
   const mintToSelectAccounts = async (address: string) => {
     setIsMinting(true)
-    await axios.post("/api/mintNft", {
+    const {
+      data: { transactionHash },
+    } = await axios.post("/api/mintNft", {
       address,
     })
-    setIsMinting(false)
+    console.log({ transactionHash })
+    setReceiptData({ transactionHash })
+    setTimeout(async () => {
+      await fetchCurrentNft()
+      setIsMinting(false)
+    }, 3000)
   }
 
   const mintUI = () => {
@@ -257,6 +265,7 @@ export const MintNft = () => {
                   <li
                     onClick={() => {
                       setSelectedAccToMint(item)
+                      setReceiptData({})
                     }}
                     className={`p-2 text-xs ${
                       selectedAccToMint === item ? "font-bold" : ""
@@ -279,6 +288,21 @@ export const MintNft = () => {
                     <p className="font-bold text-green-500">
                       Select account has a valid NFT
                     </p>
+                    <img
+                      src="https://raw.githubusercontent.com/TorontoDAO/Memberships/main/MembershipImages/70.png"
+                      className="h-[100px] w-[200px]"
+                    />
+                    {console.log(receiptData)}
+                    {Boolean(receiptData.transactionHash) && (
+                      <a
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-blue-500"
+                        href={`https://gnosis.blockscout.com/tx/${receiptData.transactionHash}`}
+                      >
+                        Transaction Details Link
+                      </a>
+                    )}
                   </>
                 ) : (
                   <>
@@ -287,7 +311,7 @@ export const MintNft = () => {
                         <div role="status">
                           <svg
                             aria-hidden="true"
-                            className="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                            className="size-8 animate-spin fill-blue-600 text-gray-200 dark:text-gray-600"
                             viewBox="0 0 100 101"
                             fill="none"
                             xmlns="http://www.w3.org/2000/svg"
@@ -303,32 +327,53 @@ export const MintNft = () => {
                           </svg>
                           <span className="sr-only">Loading...</span>
                         </div>
+                        {Boolean(receiptData.transactionHash) && (
+                          <a
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-blue-500"
+                            href={`https://gnosis.blockscout.com/tx/${receiptData.transactionHash}`}
+                          >
+                            Transaction Details Link
+                          </a>
+                        )}
                       </>
                     ) : (
-                      <button
-                        disabled={
-                          accounts.length === 0 ||
-                          selectedAccToMint === "" ||
-                          selectedAccLoading === true
-                        }
-                        className={`rounded-lg ${
-                          accounts.length !== 0 &&
-                          selectedAccToMint !== "" &&
-                          selectedAccLoading === false
-                            ? "bg-blue-700"
-                            : "bg-gray-400"
-                        } px-5 py-2.5 text-sm font-medium text-white focus:outline-none focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800`}
-                        onClick={() => {
-                          console.log("clicked")
-                          mintToSelectAccounts(selectedAccToMint).then(() => {
-                            fetchCurrentNft()
-                          })
-                        }}
-                      >
-                        {selectedAccLoading
-                          ? "Loading"
-                          : "Mint To Selected Account"}
-                      </button>
+                      <>
+                        <button
+                          disabled={
+                            accounts.length === 0 ||
+                            selectedAccToMint === "" ||
+                            selectedAccLoading === true
+                          }
+                          className={`rounded-lg ${
+                            accounts.length !== 0 &&
+                            selectedAccToMint !== "" &&
+                            selectedAccLoading === false
+                              ? "bg-blue-700"
+                              : "bg-gray-400"
+                          } px-5 py-2.5 text-sm font-medium text-white focus:outline-none focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800`}
+                          onClick={() => {
+                            console.log("clicked")
+                            mintToSelectAccounts(selectedAccToMint)
+                          }}
+                        >
+                          {selectedAccLoading
+                            ? "Loading"
+                            : "Mint To Selected Account"}
+                        </button>
+                        {console.log(receiptData)}
+                        {Boolean(receiptData.transactionHash) && (
+                          <a
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-blue-500"
+                            href={`https://gnosis.blockscout.com/tx/${receiptData.transactionHash}`}
+                          >
+                            Transaction Details Link
+                          </a>
+                        )}
+                      </>
                     )}
                   </>
                 )}
