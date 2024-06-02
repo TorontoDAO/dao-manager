@@ -26,14 +26,78 @@ export const MintNft = () => {
     true
   )
   const [isMinting, setIsMinting] = useState<boolean | null>(false)
+  const [createdAcc, setCreatedAcc] = useState<any>([])
+
+  useEffect(() => {
+    if (supabaseUser?.id) {
+      ;(async () => {
+        const {
+          data: { data: addressArray },
+        }: any = await axios.post("/api/supabase/select", {
+          match: {
+            user_id: supabaseUser?.id,
+          },
+          table: "evm_accounts",
+        })
+        const address = addressArray.map((item: any) => item.address)
+        setCreatedAcc(address)
+      })()
+    }
+  }, [supabaseUser])
+
+  console.log({ createdAcc })
 
   const fetchCurrentNft = async () => {
     setSelectedAccLoading(true)
     const { data }: any = await axios.post("/api/fetchnft", {
       address: selectedAccToMint,
     })
-setSelectedAccHasNft(data?.hasNft)
+    setSelectedAccHasNft(data?.hasNft)
     setSelectedAccLoading(false)
+  }
+
+  const [alreadyHasNft, setAlreadyHasNft] = useState(false)
+  const [eligibleToMintLoading, setEligibleToMintLoading] = useState(false)
+
+  const fetchIsValidNfts = async (address: string) => {
+    const { data }: any = await axios.post("/api/fetchnft", {
+      address,
+    })
+    return data?.hasNft
+  }
+
+  useEffect(() => {
+    ;(async () => {
+      if (accounts.length > 0) {
+        setEligibleToMintLoading(true)
+        let hasNft = false
+        for (const account of accounts) {
+          const hasNftForAccount = await fetchIsValidNfts(account)
+          if (hasNftForAccount) {
+            hasNft = true
+            break
+          }
+        }
+        setAlreadyHasNft(hasNft)
+        setEligibleToMintLoading(false)
+      }
+    })()
+  }, [accounts])
+
+  const callAllNfts = async () => {
+    if (accounts.length > 0) {
+      setEligibleToMintLoading(true)
+      let hasNft = false
+      for (const account of accounts) {
+        const hasNftForAccount = await fetchIsValidNfts(account)
+        if (hasNftForAccount) {
+          hasNft = true
+          break
+        }
+      }
+      setAlreadyHasNft(hasNft)
+      setEligibleToMintLoading(false)
+    }
   }
 
   useEffect(() => {
@@ -196,7 +260,7 @@ setSelectedAccHasNft(data?.hasNft)
     })()
   }, [getUser])
 
-  if (loading) {
+  if (loading || eligibleToMintLoading) {
     return (
       <div role="status">
         <svg
@@ -232,8 +296,11 @@ setSelectedAccHasNft(data?.hasNft)
     setTimeout(async () => {
       await fetchCurrentNft()
       setIsMinting(false)
+      callAllNfts()
     }, 3000)
   }
+
+  const hideCreateAccBtn = accounts.some((item:any) => createdAcc.includes(item))
 
   const mintUI = () => {
     return (
@@ -272,7 +339,11 @@ setSelectedAccHasNft(data?.hasNft)
                     }`}
                     key={idx}
                   >
-                    Account {idx + 1}. {item}
+                    Account {idx + 1}. {item} <br />
+                    <span className="text-blue-500">
+                      {createdAcc.includes(item as any) &&
+                        "Account created in app"}
+                    </span>
                   </li>
                 ))}
                 {accounts.length === 0 && (
@@ -381,21 +452,33 @@ setSelectedAccHasNft(data?.hasNft)
             )}
 
             <div className="space-y-2">
-              <p>Need to Add a Different Account?</p>
-              <p>Connect a wallet (top right), or</p>
-              <button
-                onClick={() => {
-                  createAccount()
-                }}
-                className="rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-              >
-                Create New Account
-              </button>
-              <p>
-                We can create an account for you and mint directly to it in one
-                go. You can export the account to a wallet later whenever you
-                want to.
-              </p>
+              {alreadyHasNft ? (
+                <>
+                  <p>You already have a valid NFT</p>
+                </>
+              ) : (
+                <>
+                  {" "}
+                  <p>Need to Add a Different Account?</p>
+                  <p>Connect a wallet (top right), or</p>
+                  <button
+                    onClick={() => {
+                      createAccount()
+                    }}
+                    disabled={hideCreateAccBtn}
+                    className={`rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 ${
+                      hideCreateAccBtn && "opacity-40"
+                    }`}
+                  >
+                    Create New Account
+                  </button>
+                  <p>
+                    We can create an account for you and mint directly to it in
+                    one go. You can export the account to a wallet later
+                    whenever you want to.
+                  </p>
+                </>
+              )}
             </div>
           </div>
         ) : (
